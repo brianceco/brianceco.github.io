@@ -5,4 +5,4 @@ inline: true
 related_posts: false
 ---
 
-A simple inline announcement.
+you can [download pdf](https://brianceco.github.io/assets/pdf/essay.pdf) here.
