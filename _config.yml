@@ -94,7 +94,7 @@ bing_site_verification: # out your bing-site-verification ID (Bing Webmaster)
 # -----------------------------------------------------------------------------
 
 blog_name: Summer Nights in Tohoku 
-blog_description: Musings on the intersection of math finance and machine learning. 
+blog_description: Musings at the intersection of math finance and machine learning. 
 permalink: /blog/:year/:title/
 lsi: false # produce an index for related posts
 
@@ -176,6 +176,7 @@ markdown: kramdown
 highlighter: rouge
 kramdown:
   input: GFM
+  math_engine: mathjax
   syntax_highlighter_opts:
     css_class: "highlight"
     span:

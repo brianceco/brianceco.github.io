@@ -1,0 +1,275 @@
+---
+layout: post
+title: (continuous) Reinforcement Learning
+date: 2026-03-01 14:24:00
+description: 
+tags: reinforcement_learning 
+toc: 
+  beginning: true
+---
+
+
+# **What is (continuous) reinforcement learning?**
+
+Reinforcement learning (RL) is a machine learning paradigm which formalizes the *trial-and-error* approach to learning: an *agent* interacts with an *environment* via some *policy* they can control, so as to maximize some *reward*. The
+
+Every algorithm under the reinforcement learning (RL) paradigm consists of three fundamental components, coming together to encode the ``trial and error" approach characteristic of RL:
+\begin{enumerate}[1.]
+        \item (*Exploration*). 
+        \item (**)
+\end{enumerate}
+
+can be (roughly) characterized along the following constituent dimensions. 
+
+
+# **discrete RL**
+We first begin by recalling the theory of reinforcement learning in discrete time and space that we want to extend to the continuous setting.
+We consider a (time-homogeneous) Markov Decision Process (MDP) $\lb X_t\rb_{t=0}^{T}$ with finite state space $\mathcal{X}$ and finite action space $\mathcal{A}$. The dynamics of $X_t$ are governed by a transition kernel 
+
+$$
+p(x^\prime\mid x,a)\coloneqq \mathbf{P}(X_{t+1}^{a}=x^\prime\mid X_{t}=x,A_t=a)
+$$ 
+
+from $\mathcal{X} \times \mathcal{A}$ to $\mathcal{X}$, where $\lb A_{t}\rb_{t=0}^{T}$ is the action process following an admissible policy $A_t \sim \pi(da\mid X_t^{A}) \in \euscr{P}(\mathcal{A})$. We are interested in the episodic setting, in which our environment evolves over some finite time horizon $T \in \mathbf{N}$. The goal is to identify an admissible policy $\pi^{\ast}=\pi^{\theta ^{\ast}}$ from some parametric family $\theta  \in \Theta \subset \mathbf{R}^{N_\theta }$ which is *optimal* from the point of view that it maximizes the value function 
+
+$$ 
+J(x;\pi) \coloneqq \E_{x}\left[ \sum\limits_{t=0}^{T}\beta ^{t} r(X_t^A,A_t) \right] 
+$$ 
+
+defined as the cumulative discounted expected reward, with discount rate $\beta  \in (0,1)$ and reward function $r\colon \mathcal{X} \times \mathcal{A}\to \mathcal{P}(\mathbf{R})$.
+
+
+We aim to identify an optimal policy via gradient ascent along an estimate $J^{\theta }(t,x;\phi_n)$ (i.e., the *critic*) of the value function for the current policy $\pi^{\phi _n}$ (i.e., the *actor*). Any *Actor-Critic (AC) algorithm* consists of iteratively carrying out a sub-algorithm consisting of the following two steps:
+1. (*Approximation in value space* $\Theta$). Given the current policy $\phi _n$, we need to estimate the associated value function $J^{\theta }(x)\coloneqq J^{\theta }(x;\phi _n)$. This is the *policy evaluation* step.  
+2. (*Approximation in policy space* $\Phi$). We update our policy estimate via gradient ascent along our critic $J(X_t^{\phi _t};\phi _t)\coloneqq J^{\theta }(X^{\phi_t}_t;\phi _t)$ at the current state: 
+
+$$
+\phi _{t+1} = \phi _t + \alpha \frac{\partial J}{\partial \phi _t}(X_{t}^{\phi _t};\phi _n)
+.$$
+
+This is the *policy improvement* (or *policy gradient*) step.
+\end{enumerate}
+Regarding estimation in value space, various PE algorithms can be found within the RL literature, in both the offline and online setting. The most popular class of PE algorithms are (*stochastic*-)*gradient* and *semi-gradient methods*.
+
+Two of the most popular such algorithms are 
+\begin{enumerate}[1.]
+        \item (*Gradient Monte Carlo*). 
+\end{enumerate}
+
+The PG step boils down to estimating the gradient $\frac{\partial J}{\partial \phi } (x;\phi )$ of the critic. In order to develop approximation algorithms, we must first characterize this gradient in terms of the definition of the value function. Taking the (iterated) conditional expectation with respect to the first action $A_0^{\phi}$, we have 
+
+$$
+J(x_0;\phi )= \sum\limits_{a_0 \in \mathcal{A}} \pi^{\phi }(a_0\mid x_0)Q^{\phi }(x_0,a_0)
+$$
+
+where $Q(x,a;\phi )\coloneqq\E_{x,a}\left[ \sum\limits_{t=0}^{T} \beta ^{t}r(X^{\phi }_t,A_t^{\phi }) \right]$ is the $Q$-function associated to $\pi^{\phi}$. Taking the gradient with respect to $\phi $ yields 
+
+$$
+        \frac{\partial J}{\partial \phi } (x_0;\phi ) =   \sum\limits_{a_0 \in \mathcal{A}}^{} \frac{\partial \pi^{\phi }}{\partial \phi } (a_0\mid x_0) Q(x_0,a_0;\phi ) + \pi^{\phi }(a_0\mid x_0)\frac{\partial Q}{\partial \phi } (x_0,a_0;\phi ).
+$$
+
+We consequently unroll the $Q$-function one step forward in time by conditioning on $X^{\phi }_1$, using the Markovian structure of $(X^{\phi }_t,A_t^{\phi })$:
+
+$$
+Q(x_0,a_0;\phi )=\E[r(x_0,a_0)] + \beta \sum\limits_{x_1 \in \mathcal{X}}^{} p(x_1\mid x_0,a_0)J(x_1;\phi )
+$$
+
+where implicitly we note $J(x_1;\phi)$ is a summation up to $T-1$. Substituting this into the previous equation yields $$\begin{align*}
+        \frac{\partial J}{\partial \phi } (x_0;\phi ) =   \sum\limits_{a_0 \in \mathcal{A}}^{} \frac{\partial \pi^{\phi }}{\partial \phi } (a_0\mid x_0) Q(x_0,a_0;\phi ) + \beta\pi^{\phi }(a_0\mid x_0) \sum\limits_{x_1 \in \mathcal{X}}^{}p(x_1\mid x_0,a_0) \frac{\partial J}{\partial \phi } (x_1;\phi )\\
+        &=  
+.\end{align*}$$
+
+Iterating this procedure, we obtain 
+
+$$
+        \frac{\partial J}{\partial \phi } (x_0;\phi ) = \sum\limits_{x \in \mathcal{X}}^{} \rho ^{\phi }_{x_0}(x) \underbrace{\sum\limits_{a \in \mathcal{A}}^{} \frac{\partial \pi^{\phi }}{\partial \phi } (a\mid x)Q(x,a;\phi )}_{\eqqcolon \ell (x)}
+$$
+
+where $\rho^{\phi }_{x_0}(x)\coloneqq\sum\limits_{t=0}^{T} \beta ^{t}\mathbf{P}_{x_0}(X^{\phi }_t=x)$ is the *(discounted) occupation time* at state $x$. The current formulation of the gradient cannot be efficiently estimated via a single sample $(X_t^{\phi },A_t^{\phi })$ as it requires estimating the gradient of the policy and associated $Q$-function over all state-action pairs. To overcome this, we rewrite the gradient as 
+
+$$\begin{align*}
+\frac{\partial J}{\partial \phi } (x_0;\phi ) &=   \sum\limits_{x \in \mathcal{X}}^{} \E_{x_0}\left[ \sum\limits_{t=0}^{T} \beta ^{t}\bm{1}_{\lb X^{\phi }_t=x\rb  } \right] \ell (x)\\
+&= \E_{x_0} \left[\sum\limits_{t=0}^{T} \beta ^{t}  \sum\limits_{x \in \mathcal{X}}^{}\bm{1}_{\lb X^{\phi }_t=x\rb  }\ell (X^{\phi }_t)  \right]  \\
+&= \E_{x_0} \left[ \sum\limits_{t=0}^{T} \beta ^{t} \ell (X^{\phi }_t) \right] \\
+&= \E_{x_0} \left[ \sum\limits_{t=0}^{T} \beta ^{t} \sum\limits_{a \in \mathcal{A}}^{} \pi^{\phi }(a\mid X^{\phi }_t)\frac{\partial \log \pi^{\phi }}{\partial \phi } (a\mid X^{\phi }_t) Q(X^{\phi }_t,a;\phi ) \right] \\
+&=  \E_{x_0}\left[ \sum\limits_{t=0}^{T} \beta ^{t} \E\left[ \frac{\partial \log \pi^{\phi }}{\partial \phi } (A^{\phi }_t\mid X^{\phi }_t)Q(X^{\phi}_t,A^{\phi }_t;\phi )\mid X^{\phi }_t \right]  \right] \\
+&=  \E_{x_0}\left[ \sum\limits_{t=0}^{T} \beta ^{t} \frac{\partial \log \pi^{\phi }}{\partial \phi } (A^{\phi }_t\mid X^{\phi }_t)Q(X^{\phi}_t,A^{\phi }_t;\phi ) \right] \\
+&=  \E_{x_0}\left[ \sum\limits_{t=0}^{T} \beta ^{t} \frac{\partial \log \pi^{\phi }}{\partial \phi } (A^{\phi }_t\mid X^{\phi }_t)\left(Q(X^{\phi}_t,A^{\phi }_t;\phi ) -B(X^{\phi })\right)\right] 
+\end{align*}$$
+
+where in the last line $B(x)$ is an arbitrary function of the state, called the *baseline*, and we have made use of the fact that $\sum\limits_{i=1}^{N_\phi } \partial \log \pi^{\phi } / \partial \phi =0$. Thus, we have represented the gradient of the critic as an expectation with respect to a given sample $\lb (X_t^{\phi },A_t^{\phi })\rb_{t=0}^{T}$. If in place of $Q(X_{t}^{\phi },A_t^{\phi };\phi)$, we instead had the *return* $G^{\phi}(X_{t}^{\phi},A_{t}^{\phi})\coloneqq \sum\limits_{k=t}^{T} r(X_{k}^{\phi },A_{k}^{\phi })$ from time $t$ onwards, we would get the actor-only *REINFORCE with baseline* algorithm. The benefit of including a baseline is that we get an estimator for the gradient of the critic which remains unbiased but with potentially smaller variance. The most common choice of baseline is $B(x)=J^{\theta }(x;\phi _t)$, the estimate of the value function for the current policy. In this setting, the policy parameter intuitively updates $\phi _{t+1}\leftarrow \phi _t$ in the direction which maximizes the log-likelihood of the current policy with respect to the current action $A^{\phi _t}_t$, with the step size scaled by the *advantage* of that action, the latter defined by 
+
+$$
+        \mathit{Ad}^{\theta }(X^{\phi _t}_t,A^{\phi _t}_t;\phi _t)\coloneqq Q^{\theta }(X^{\phi _t}_t,A^{\phi _t};\phi _t)_t - J^{\theta }(X^{\phi }_t;\phi _t).
+$$
+
+# cRL via Stochastic Control
+One way to motivate the stochastic control formulation of cRL is as follows. Stochastic control (SC) and reinforcement learning (RL) are both methods for optimizing sequential decision making with respect to a given reward function. The idea is that an agent is able to interact with their environment (state) via a series of actions (controls). Where SC and RL diverge is that the former is *model-based*, i.e. it presumes one has perfect knowledge of the dynamics by which the state/environment evolve, and consequently seeks to obtain existence/uniqueness results for an optimal *feedback* control defined in terms of a deterministic policy of the state. In contrast, RL begins from a starting point of incomplete information, where an agent only learns about the (unknown) dynamics of their environment via their interaction with it, generating a realization from which the agent can learn an (approximately) optimal policy. In order to achieve this, the agent chooses actions both to *optimize their reward* (as in SC) and to *explore their environment*. It is this latter condition which necessitates actions being sampled *randomly* according to a policy (distribution), independently of the randomness of the environment.
+
+Both SC and RL evolve according to the state-action-reward-state dynamic programming paradigm.
+
+Throughout, we assume we are working over a filtered probability space which supports countably many mutually independent Brownian motions $W_t, W^{i}_t$ and
+
+In order to motivate the stochastic-control formulation of continuous RL, we begin with the classical stochastic-control setting. We have a state process $X_t^{a}$ which evolves via an It\^o diffusion 
+
+$$
+        dX^{a}_t = b(t,X_t,a_t)dt  + \sigma(t,X_t,a_t)dW_t
+.$$
+
+We assume for the moment every process in sight is one-dimensional for simplicity. Here $a_t$ is our control process, taking values in the action space $A \subset \mathbf{R}$. We seek to maximize the value function 
+
+$$
+J^{a}(t,x)\coloneqq  \E_{t,x}^{\mathbf{P}^{W}}\left[ \int_{t}^{T} e^{-\beta (s-t)}h(s,X^{a}_s,a_s)\,dt +e^{-\beta (T-t)} g(X^{a}_T) \right] 
+$$
+
+given by the expected discounted running and terminal rewards $h(t,x,a)$ and $g(x)$ over a finite time horizon $T>0$ (i.e. *episodic* stochastic control). Thus, we sought a function $a(t,x)$ so that the value function $J^{*}(t,x)$ of the feedback policy $a^{*}_t = a(t,X^{a^{*}}_t)$ satisfied
+
+$$
+J^{*}(t,x)\coloneqq J^{a^{*}}(t,x) = \sup _{a_t \in \euscr{A}}J^{a}(t,x)
+$$
+where $\euscr{A}$ was some admissible class of controls.
+
+Translating this into the RL paradigm amounts to injecting randomness into our action process. To do so, we extend our probability space via $\mathbf{P}=\mathbf{P}_W\times \mathbf{P}_Z$, where $Z\sim \mathrm{Unif}([0,1])$ governs the exploration of our actions. Namely, we now consider *distribution-valued controls* $\pi_t \in \mathcal{P}(A)$, aka *policies* which are Markovian in the sense that they have the feedback form $\pi_t(da)=\pi(da\mid t,x)$. We then consider a *randomized* action process $a^{\pi}_t \sim \pi_t$ sampled according to our policy. We can formalize this for example by defining 
+
+$$
+        A^{\pi}_t \coloneqq Q_{\pi(dA\mid t,X^{\pi}_t)}(Z)
+$$
+
+where $Q$ denotes the quantile function of $\pi(da\mid t,X^{\pi}_t)$, and $X^{\pi}(t)$ is the state process
+
+$$
+        dX^{\pi}_t = b(t,X^{\pi}_t,A^{\pi}_t)dt + \sigma(t,X^{\pi}_t,A^{\pi}_t)dW_t
+.$$
+
+Of course, $a^{\pi}$ is defined recursively in terms of the state $X^{\pi}$, so we must guarantee that this SDE (with randomized coefficients given the dependence on $Z$) exists, which requires some reasonable assumptions on the policy $\pi$. Now that we have randomized actions and state dynamics, we can formulate the objective of our continuous RL problem, which is simply to optimize the *exploration-regularized* value function 
+$$
+J^{\pi}(t,x) \coloneqq \E_{t,x}^{\mathbf{P}}\left[ \int_{t}^{T} e^{-\beta (s-t)}(h(s,X^{\pi}_s,A^{\pi}_s) - \gamma \log \pi(A^{\pi}_s\mid s,X^{\pi}_s) \,ds +e^{-\beta (T-t)} g(X^{a}_T) \right] 
+$$
+where we have introduced the entropy regularization $H(\pi)\coloneqq - \log \pi$  and temperature parameter $\gamma \geq 0$ to encourage exploration. Because we will use it repeatedly, for convenience we abbreviate the undiscounted integrand 
+
+$$
+F(t,x,a,\pi)\coloneqq  h(s,x,a) + \gamma H(\pi)
+.$$
+
+While we have setup a reasonable model for continuous RL, from a theoretical standpoint, it is kind of annoying that we are working with controls $a_t^{\pi}$ randomized exogenously to our state noise $W_t$. This introduces questions about exactly which tools from classical stochastic control we can apply to our setting. In order to resolve such technical points, we would like to *integrate out* the policy randomization from our state process. A naive way to do this would be to consider the process conditioned on the environment noise, which by independence yields
+
+$$
+\E^{\mathbf{P}}[X_{t}\mid \euscr{F}^{W}_t] = \E^{\mathbf{P}^{Z}}[X_t] 
+.
+$$
+
+It turns out this is not the correct choice. With this in mind, let's consider the *relaxed control* state process $\overline{X}_t^{\pi}$ characterized by the SDE
+
+$$
+        d \overline{X}_t^{\pi} = \overline{b}(t,\overline{X}_t^{\pi})dt + \overline{\sigma}(t,\overline{X}_t)dW_t
+$$
+where 
+
+$$
+\overline{b}(x,t) \coloneqq \int_{A}^{} b(t,x,a)\pi(da\mid t,x) \hspace{10pt} \text{and}\hspace{10pt} \overline{\sigma}(x,t)\coloneqq\sqrt{\int_{A}^{} \sigma^2(t,x,a)\pi(da\mid t,x)} 
+.$$
+
+Thus, $\overline{X}_t^{\pi}$ represents the environment dynamics where we have averaged out the policy exploration $\pi_t$. While $X_t^{\pi}$ can be observed by sampling the policy $A_t^{\pi} \sim \pi(da\mid t,X_t^{\pi})$, $\overline{X}^{\pi}_t$ is unobservable. The authors motivate the definition of $\overline{X}_t^{\pi}$ via a law of large numbers argument. Note $\overline{X}_t^{\pi}$ is clearly $\euscr{F}^{W}_t$-adapted and thus can really be thought of as a process on $\Omega^{W}$. In fact it is somewhat nontrivial to show that the two processes agree in distribution.
+
+## Policy evaluation in cRL
+The first stage in the recursive *actor-critic algorithm* is *policy evaluation*. Namely, suppose we have an admissible policy $\pi$ whose value function $J(t,x)\coloneqq J^{\pi}(t,x)$ we would like to approximate $\widetilde{J}(t,x)$. In order to devise algorithms for estimating the critic $\widetilde{J}(t,x)$, we need useful characterizations of the value function. We have two, both of which following from the observation that 
+
+$$
+        M(\widetilde{X})_t \coloneqq e^{-\beta t}J(t,\widetilde{X}_t) + \int_{0}^{t} e^{-\beta s} \widetilde{F}(s,\widetilde{X}_s)\,ds
+$$
+
+is a $(\mathbf{F}^{\overline{X}}_t, \mathbf{P}^{W})$-martingale in the case $\widetilde{X}=\overline{X}$ and $\widetilde{F}=F$, and a $(\mathbf{F}^{X^{\pi}}_t, \mathbf{P})$-martingale in the case $\widetilde{X}=X^{\pi}$ and $\widetilde{F}=\overline{F}$.
+
+##### Theorem (*Martingality characterization of the value function*).
+
+Let $\widetilde{J}\colon [0,T] \times \mathbf{R}^{d} \to \mathbf{R}$ be a $C^{1,2}$ function such that $J(T,x)=h(x)$. The following are equivalent:
+1. $\widetilde{J}=J$ is the value function.
+2. For any initialization $(t,x)\in [0,T) \times \mathbf{R}^{d}$, the process
+
+    $$
+                        \overline{M}_s \coloneqq  e^{-\beta  s}\widetilde{J}(s,\overline{X}^{\pi}_u) + \int_{t}^{s} e^{-\beta  s}\overline{F}(u,\overline{X}^{\pi}_u)\,du
+    $$
+
+    is a $(\euscr{F}_{t}^{\overline{X}^{\pi}},\mathbf{P}^{W})$-martingale on $[t,T]$.
+3. (*Martingale orthogonality*). For every $(\euscr{F}_t^{X^{\pi}}, \mathbf{P})$-progressively measurable bounded process $\xi_t$,
+
+$$
+                        \E^{\mathbf{P}}\int_{0}^{T} \xi_t\,\underbrace{\left[d\widetilde{J}(t,X^{\pi}_t)+e^{-\beta  t}F(t,X^{\pi}_t)dt-\beta \widetilde{J}^{\pi}(t,X^{\pi}_t)dt)\right]}_{\eqqcolon dM_t}=0
+$$
+
+##### *Proof.*
+That the true value function satisfies both (2) and (3) is immediate from It\^o's formula. To see (2) implies (1), we note that 
+
+$$\begin{align*}
+        e^{-\beta  t}\widetilde{J}(t,x)&=   \overline{M}_t \\
+                          &= \E^{\mathbf{P}^{W}}[\overline{M}_T\mid \euscr{F}^{\overline{X}^{\pi}}_t]\\
+                          &= \E^{\mathbf{P}^{W}}[\overline{M}_T\mid \overline{X}^{\pi}_t=x]  \\
+                          &= e^{-\beta t}J(t,x)  
+\end{align*}$$
+
+where we used the Markov property for $\overline{X}^{\pi}_t$ in line 3. 
+
+We will now show (3) is equivalent to (2). Firstly note that
+
+$$
+d \overline{M}_t =  d\widetilde{J}(t,\overline{X}^{\pi}_t)+F(t,\overline{X}^{\pi}_t,a,\pi)dt-\beta \widetilde{J}^{\pi}(t,\overline{X}^{\pi}_t)dt.
+$$
+
+It is clear that if $$\overline{M}_t$$ is a martingale than the corresponding stochastic integral is a martingale, hence its expectation is zero. The same is true for any test process $$\xi_t^\prime=\xi_t e^{\beta t}$$. For the converse, by It\^o's lemma, $$M_t$$ is a diffusion $$M_t=\int_{0}^{t} \widetilde{b}_s\,ds + \int_{0}^{t} \widetilde{\sigma}_s\,dW_s$$ for some $$\euscr{F}^{X^{\pi}}$$-adapted processes $$\widetilde{b}_t, \widetilde{\sigma}_t$$. Taking $$\xi_t$$ an arbitrary finite variation process, we conclude $$b_t=0$$, hence $$M_t$$ is a $$(\euscr{F}^{X^{\pi}}_t,\mathbf{P})$$-martingale.
+
+Now to show that this completes the proof, note that any $$(\euscr{F}^{X^{\pi}}_t,\mathbf{P})$$-progressively measurable process $$\xi_t$$ takes the form $$\xi_t \coloneqq \xi(t,X_{\bullet }^{\pi})$$ for some progressively measurable map $$\xi\colon [0,T] \times C([0,T], \mathbf{R})\to \mathbf{R}$$. Defining $$\overline{\xi}_t\coloneqq \xi(t,\overline{X}^{\pi}_\bullet )$$, we observe 
+
+$$\begin{align*}
+       \E^{\mathbf{P}}\left[ \int_{0}^{T} \xi_t\,dM_t \right] =  \E^{\mathbf{P}^{W}}\left[ \int_{0}^{T} \overline{\xi}_te^{\beta  t}\,d\overline{M}_t \right]
+.\end{align*}$$
+
+This theorem allows us to generalize various PE algorithms from discrete to continuous time. In particular, taking the test process $\xi_t=J^{\theta }(t,x)$ to the current estimate of the value function, 
+
+
+
+## Policy gradient (policy evaluation in disguise)
+Having carried out the policy evaluation step to obtain the critic $J=J^{\theta }$, we now look towards improving our estimation of the optimal policy via the policy gradient step. We assume our current policy estimate is of the form $\pi^{\phi  }$ with $\phi \in \Phi \subset \mathbf{R}^{N_\phi }$, and we let $g^{\phi }(t,x)= \frac{\partial }{\partial \phi } J(t,x;\pi^{\phi})$ denote the policy gradient. Provided $J$ is sufficiently regular (i.e. $C^{1,2}$), it is characterized as the unique solution of the Feynman-Kac formula
+
+$$
+\begin{cases}
+        \int_{A}^{} (\mathcal{L}^{a}J + r(t,x,a)+ \gamma p(t,x,a,\pi^{\phi }(-\mid t,x)) - \beta  J)  \pi(a\mid t,x)\,da\\
+       J^{\theta}(T,x;\pi^{\phi })=g(x)
+\end{cases}
+.$$
+
+Differentiating in $\phi $ gives a new system of $N_{\phi }$ equations characterizing the policy gradient
+
+$$
+\begin{cases}
+\int_{A}^{}(\mathcal{L}^{a}g^{\phi} - \beta g^{\phi}  + \overline{r}^{\phi }(t,x,a)) \pi^{\phi }(a\mid t,x) da\\
+       J^{\theta}(T,x;\pi^{\phi })=g(x)
+\end{cases}
+$$
+
+where
+
+$$
+\overline{r}^{\phi }(t,x,a)\coloneqq \gamma  \frac{\partial }{\partial \phi } p(t,x,a,\pi^{\phi }(-\mid t,x)) + (\mathcal{L}^{a}J + r(t,x,a)+ \gamma p(t,x,a,\pi^{\phi }(-\mid t,x)) - \beta  J)\frac{\partial }{\partial \phi }\log \pi(a\mid t,x)
+.$$
+
+Thus, Feynman-Kac implies that $g^{\phi }$ is uniquely characterized by the conditional expectation
+
+$$
+g^{\phi }(t,x)=\E_{t,x}^{\mathbf{P}}\left[ \int_{t}^{T}e^{-\beta (s-t)} \overline{r}(s,X^{\pi}_s,a^{\pi}_s)\,ds \right] 
+$$
+i.e., $g^{\phi }$ is a value function with respect to a new reward $\overline{r}$, and hence estimating the policy gradient reduces to policy evaluation. Note however that our reward $\overline{r}$ is defined in terms of the generator $\mathcal{L}^{a}J$, which is not observable and hence we must re-characterize the policy gradient in a way which is amenable to learning from the environment. As always, the approach is use It\^o's lemma together with martingality.
+
+\begin{theorem}[Representation theorem for policy gradient]
+       The policy gradient is given by
+
+$$
+       g^{\phi }(t,x) = \E^{\mathbf{P}}_{t,x}\left[ e^{-\beta (s-t)} \left(\frac{\partial }{\partial \phi } \log \pi^{\phi }(a^{\pi}_s\mid s,X^{\phi }_s)dM(s,X^{\phi }_s,a^{\phi }_s) + \gamma q(s,X^{\phi }_s,a^{\phi }_s)ds\right)  \right] 
+$$
+where $M(s,X^{\phi }_s,a^{\phi }_s)$ is the $(\mathbf{F}^{X^{\phi }},\mathbf{P})$-martingale
+\end{theorem}
+
+## AC algorithms in cRL
+
+## Bridging RL and cRL
+
+## Applications to MVO
