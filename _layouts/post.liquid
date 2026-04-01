@@ -61,9 +61,10 @@ layout: default
 
   <article class="post-content">
     {% if page.toc and page.toc.beginning %}
-      <div id="table-of-contents">
+      <details class="table-of-contents">
+        <summary>Table of Contents</summary>
         {% toc %}
-      </div>
+      </details>
       <hr>
     {% endif %}
     <div id="markdown-content">
