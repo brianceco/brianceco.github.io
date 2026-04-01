@@ -4,6 +4,10 @@
 
 @use "variables" as v;
 
+.navbar .container {
+  max-width: 930px;
+}
+
 .navbar {
   box-shadow: none;
   border-bottom: 1px solid var(--global-divider-color);
