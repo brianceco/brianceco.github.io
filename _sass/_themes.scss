@@ -10,8 +10,8 @@
   --global-code-bg-color: #{v.$code-bg-color-light};
   --global-text-color: #{v.$black-color};
   --global-text-color-light: #{v.$grey-color};
-  --global-theme-color: #{v.$purple-color};
-  --global-hover-color: #{v.$purple-color};
+  --global-theme-color: #2e7de9;
+  --global-hover-color: #2e7de9;
   --global-hover-text-color: #{v.$white-color};
   --global-footer-bg-color: #{v.$grey-color-dark};
   --global-footer-text-color: #{v.$grey-color-light};
@@ -76,12 +76,12 @@
 
 html[data-theme="dark"] {
   color-scheme: dark;
-  --global-bg-color: #{v.$grey-color-dark};
+  --global-bg-color: #1a1b26;
   --global-code-bg-color: #{v.$code-bg-color-dark};
-  --global-text-color: #{v.$grey-color-light};
+  --global-text-color: #e8e8e8;
   --global-text-color-light: #{v.$grey-color};
-  --global-theme-color: #{v.$cyan-color};
-  --global-hover-color: #{v.$cyan-color};
+  --global-theme-color: #7aa2f7;
+  --global-hover-color: #7aa2f7;
   --global-hover-text-color: #{v.$white-color};
   --global-footer-bg-color: #{v.$grey-color-light};
   --global-footer-text-color: #{v.$grey-color-dark};

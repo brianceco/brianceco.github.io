@@ -2,15 +2,63 @@
  * Blog post and listing styles
  ******************************************************************************/
 
+// Archive page
+.archive {
+  margin-top: 2rem;
+}
+
+.archive-year {
+  margin-top: 2rem;
+  margin-bottom: 0.5rem;
+  padding-bottom: 0.25rem;
+  border-bottom: 1px solid var(--global-divider-color);
+}
+
+.archive-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.archive-item {
+  display: flex;
+  align-items: baseline;
+  padding: 0.4rem 0;
+  gap: 1rem;
+}
+
+.archive-date {
+  flex-shrink: 0;
+  width: 4.5rem;
+  color: var(--global-text-color-light);
+  font-size: 0.9rem;
+}
+
+.archive-title {
+  flex-grow: 1;
+  a {
+    color: var(--global-text-color);
+    &:hover {
+      color: var(--global-theme-color);
+    }
+  }
+}
+
+.archive-meta {
+  flex-shrink: 0;
+  color: var(--global-text-color-light);
+  font-size: 0.85rem;
+}
+
 .header-bar {
   border-bottom: 1px solid var(--global-divider-color);
   text-align: center;
-  padding-top: 2rem;
-  padding-bottom: 3rem;
+  padding-top: 0rem;
+  padding-bottom: 1rem;
 
   h1 {
     color: var(--global-theme-color);
-    font-size: 5rem;
+    font-size: 3rem;
   }
 }
 
