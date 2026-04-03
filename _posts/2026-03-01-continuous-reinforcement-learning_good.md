@@ -29,14 +29,14 @@ defined as the cumulative discounted expected reward, with discount rate $\beta 
 
 We aim to identify an optimal policy via gradient ascent along the value function for the current policy $\pi^{\phi}$ (i.e., the *actor*). Since the true value function is unavailable to us, we must reformulate the policy gradient $\partial J / \partial\phi$ in terms of the value function and/or Q-function, which we substitute with an estimate $J^{\theta}(x)$ (i.e. the *critic*). Such an **Actor-Critic (AC) algorithm** thus consists of iteratively carrying the following two steps:
 
-1. (*Approximation in value space* $\Theta$). Given the current policy $\phi$, we need to estimate the associated value function $J^{\theta}(x)\approx J(x;\phi)$ from some parametric class $\theta  \in \Theta \subset \mathbf{R}^{N_{\theta }}$. This is the *policy evaluation* (*PE*) step.  
+1. (*Approximation in value space* $\Theta$). Given the current policy $\phi$, we need to estimate the associated value function $J^{\theta}(x)\approx J(x;\phi)$ from some parametric class $\theta  \in \Theta \subset \mathbf{R}^{N_{\theta }}$. This is the **policy evaluation** (**PE**) step.  
 2. (*Approximation in policy space* $\Phi$). We update our policy estimate via gradient ascent along the value function $J(x;\phi)$ at the current state $X^{\phi _t}_t$: 
 
 $$
 \phi  \leftarrow \phi  + \alpha \frac{\partial J}{\partial \phi}(X_{t}^{\phi};\phi ).
 $$ 
 
-This is the *policy improvement* (or *policy gradient* (*PG*)) *step*.
+This is the **policy improvement** (or **policy gradient** (**PG**)) *step*.
 
 Regarding estimation in value space, various *gradient-based* PE algorithms can be found within the RL literature, in both the offline and online setting, which all update the critic parameter $\theta $ via (stochastic) gradient descent along some target estimate $\widetilde{J}(x)$ for the value function $J(x)$: 
 
@@ -91,10 +91,10 @@ where in the last line $B(x)$ is an arbitrary function of the state, called the 
 
 Of course, in place of the true $Q$-function, we use the estimate $Q^{\theta }(x,a)$ from our PE step. If in place of $Q(X^{\phi }_t,A^{\phi }_t;\phi )$, we instead had the return $G^{\phi }(X^{\phi }_t,A^{\phi }_t)$ from time $t$ onwards, we would get the actor-only **REINFORCE with baseline** algorithm. 
 
-The benefit of including a baseline is that we get an estimator for the gradient of the critic which remains unbiased but with potentially smaller variance. The most common choice of baseline is $B(x)=J^{\theta }(x;\phi _t)$, the estimate of the value function for the current policy, yielding the **advantage AC (A2C) algorithm**. In this setting, the policy parameter intuitively updates $\phi _{t+1}\leftarrow \phi _t$ in the direction which maximizes the log-likelihood of the current policy with respect to the current action $A^{\phi _t}_t$, with the step size scaled by the **advantage** of that action, the latter defined by 
+The benefit of including a baseline is that we get an estimator for the gradient of the critic which remains unbiased but with potentially smaller variance. The most common choice of baseline is $B(x)=J^{\theta }(x;\phi _t)$, the estimate of the value function for the current policy, yielding the **advantage AC (A2C) algorithm**. In this setting, the policy parameter intuitively updates $\phi$ in the direction which maximizes the log-likelihood of the current policy with respect to the current action $A^{\phi}_t$, with the step size scaled by the **advantage** of that action, the latter defined by 
 
 $$
-        \mathit{Ad}^{\theta }(X^{\phi }_t,A^{\phi }_t;\phi)\coloneqq Q^{\theta }(X^{\phi}_t,A^{\phi };\phi_t) - J^{\theta }(X^{\phi }_t;\phi _t)
+        \mathit{Ad}^{\theta }(X^{\phi }_t,A^{\phi }_t;\phi)\coloneqq Q^{\theta }(X^{\phi}_t,A^{\phi };\phi) - J^{\theta }(X^{\phi }_t;\phi )
 .$$ 
 
 # **2. Stochastic control meets RL**
@@ -126,7 +126,7 @@ To ensure the classical stochastic control problem is well-posed, we assume the 
 2. The coefficients $b,\sigma$ are uniformly Lipschitz continuous with linear growth in $x$.
 3. $r$ and $h$ have polynomial growth in $(x,a)$ and $x$ respectively. 
 
-The first assumption is a convenience so we remain on the canonical path space of continuous functions indexed by $[0,T]$. The second assumption guarantees strong existence and uniqueness of $X^{a}$, together with a bound $$\E\sup_{t \in [0,T]}\lb X_t \rb^{\mu } \leq C\E\lb X_0 \rb^\mu $$ for any $\mu  \geq 2$. The third assumption ensures the value function is finite at all times.
+The first assumption is a convenience so we remain on the canonical path space of continuous functions indexed by $[0,T]$. The second assumption guarantees strong existence and uniqueness of $X^{a}$, together with a bound $$\E\sup_{t \in [0,T]}\lvert X_t\rvert^{\mu } \leq C\E\lvert X_0 \rvert^\mu $$ for any $\mu  \geq 2$. The third assumption ensures the value function is finite at all times.
 
 Translating this into the RL paradigm amounts to injecting randomness into our action process. To do so, we extend our probability space via $\mathbf{P}=\mathbf{P}_W\times \mathbf{P}_Z$, where $Z\sim \mathrm{Unif}([0,1])$ governs the exploration of our actions. Namely, we now consider (absolutely-continuous) *distribution-valued controls* $\pi_t \in \euscr{P}(A)$, aka *policies*, which are moreover Markovian in the sense that they have the feedback form $\pi_t(da)=\pi(da\mid t,x)$. We then consider a *randomized* action process $A^{\pi}_t \sim \pi_t$ sampled according to our policy. We can formalize this for example by defining 
 
@@ -149,40 +149,42 @@ $$
 where we have introduced the entropy regularization $H(\pi)\coloneqq - \log \pi$  and temperature parameter $\gamma \geq 0$ to encourage exploration. Because we will use it repeatedly, for convenience we abbreviate the non-discounted integrand 
 
 $$
-F(t,x,a,\pi)\coloneqq  r(s,x,a) + \gamma H(\pi).
+F(t,x,a)\coloneqq  r(s,x,a) + \gamma H(\pi(a|t,x)).
 $$ 
 
 While we have setup a reasonable model for continuous RL, from a theoretical standpoint, it is kind of annoying that we are working with controls $a_t^{\pi}$ randomized exogenously to our state noise $W_t$. This introduces questions about exactly which tools from classical stochastic control we can apply to our setting. In order to resolve such technical points, we would like to *integrate out* the policy randomization from our state process. The key observation is that, conditioned on the state $X_t^{\pi}$, the drift and variance processes satisfy 
 
 $$
-        \overline{b}(X^{\pi}_t,t)\coloneqq \E[b(t,X^{\pi}_t,A^{\pi}_t) |X_t^{\pi}]= \int_{\mathcal{A}}^{} b(t,X^{\pi}_t,a)\pi(a|t,X^{\pi}_t)\,da
+        \overline{b}(t,X^{\pi}_t)\coloneqq \E[b(t,X^{\pi}_t,A^{\pi}_t) |X_t^{\pi}]= \int_{\mathcal{A}}^{} b(t,X^{\pi}_t,a)\pi(a|t,X^{\pi}_t)\,da
 $$ 
 
 and 
 
 $$
-\widetilde{\sigma}^2(X^{\pi},t) = \int_{\mathcal{A}}^{} \sigma^2(t,X^{\pi}_t,a)\pi(a|t,X^{\pi}_t)\,da
+\overline{\sigma}^2(t,X^{\pi}) = \int_{\mathcal{A}}^{} \sigma^2(t,X^{\pi}_t,a)\pi(a|t,X^{\pi}_t)\,da
 .$$ 
 
 This motivates the **relaxed control** state process $\overline{X}_t^{\pi}$ characterized by the SDE 
 
 $$
         d \overline{X}_t^{\pi} = \overline{b}(t,\overline{X}_t^{\pi})dt + \overline{\sigma}(t,\overline{X}_t)dW_t
-$$ where 
+$$ 
+
+where 
 
 $$
-\overline{b}(x,t) \coloneqq \int_{A}^{} b(t,x,a)\pi(da \mid t,x) \hspace{10pt} \text{and}\hspace{10pt} \overline{\sigma}(x,t)\coloneqq\sqrt{\int_{A}^{} \sigma^2(t,x,a)\pi(da \mid t,x)} 
+\overline{b}(t,x) \coloneqq \int_{A}^{} b(t,x,a)\pi(da \mid t,x) \hspace{10pt} \text{and}\hspace{10pt} \overline{\sigma}(t,x)\coloneqq\sqrt{\int_{A}^{} \sigma^2(t,x,a)\pi(da \mid t,x)} 
 .$$
 
 Thus, $$\overline{X}_t^{\pi}$$ represents the environment dynamics where we have averaged out the policy exploration $$\pi_{t}$$. While $$X^{\pi}_t$$ can be observed by sampling the policy $$A^{\pi}_t \sim \pi(da\mid t,X^{\pi}_t)$$, $$\overline{X}^{\pi}_t$$ is unobservable. The authors motivate the definition of $$\overline{X}_t^{\pi}$$ via a law of large numbers argument which was formalized in [[3]](https://arxiv.org/abs/2503.09981). In fact it is somewhat nontrivial to show that the two processes agree in law. That the distribution of the 1-dimensional marginals of $$X_s^{\pi}$$ and $$\overline{X}_s^{\pi}$$ coincide is an immediate consequence of Corollary 4.7 of the ``Markovian projection formula" of [[4]](https://arxiv.org/abs/1011.0111). In particular, this implies by Fubini's formula that the value function of the exploratory control coincides with the value function of the relaxed control 
 
 $$
-J^{\pi}(t,x) = \E^{\mathbf{P}^{W}}_{t,x}\left[ \int_{t}^{T} e^{-\beta (s-t)}\int_{A}^{} F(t,\overline{X}^{\pi}_{t},a,\pi)\pi(a|t,\overline{X}^{\pi}_t)\,dadt + e^{-\beta (T-t)}h(\overline{X}^{\pi}_T) \right] 
+J^{\pi}(t,x) = \E^{\mathbf{P}^{W}}_{t,x}\left[ \int_{t}^{T} e^{-\beta (s-t)}\int_{A}^{} F(t,\overline{X}^{\pi}_{t},a,\pi)\pi(a|t,\overline{X}^{\pi}_t)\,dadt + e^{-\beta (T-t)}g(\overline{X}^{\pi}_T) \right]
 .$$
 
-For convenience, let's denote by $\overline{F}(t,x,a,\pi) = \int_{A}^{} F(t,\overline{X}^{\pi}_t,a,\pi)\pi(a \mid t,\overline{X}^{\pi}_t)\,da$ the associated non-discounted integrand.
+Again, let's denote by $\overline{F}(t,x) \coloneqq \int_{A}^{} F(t,x,a,\pi)\pi(a \mid t,x)\,da$ the associated non-discounted integrand.
 
-To finish the setup, we restrict the policies we consider to some admissible space $\pi \in \mathbf{A}\subset \euscr{P}(\mathcal{A})^{[0,T] \times \mathbf{R}^{d}}$ to ensure the relaxed control problem is well-posed. Namely, under some reasonable Lipschitz continuity and polynomial growth conditions similar to Assumption 1, we can guarantee the relaxed control state SDE admits a unique strong solution which also satisfies a polynomial growth condition:
+To finish the setup, we restrict the policies we consider to some admissible space $\pi \in \mathbf{A}\subset \euscr{P}(\mathcal{A})^{[0,T] \times \mathbf{R}}$ to ensure the relaxed control problem is well-posed. Namely, under some reasonable Lipschitz continuity and polynomial growth conditions similar to Assumption 1, we can guarantee the relaxed control state SDE admits a unique strong solution initialized at $x\in \mathbf{R}$ which also satisfies a polynomial growth condition:
 
 $$
 \begin{equation}\label{eqn:polygrowth}
@@ -191,54 +193,61 @@ $$
 $$ 
 
 ## **2.2. Evaluation: martingality conditions**
-The first stage in the recursive *actor-critic algorithm* is *policy evaluation*. Namely, suppose we have an admissible policy $\pi^{\phi}$ whose value function $J(t,x)\coloneqq J(t,x;\phi )$ we would like to approximate $J^{\theta}(t,x)$. In order to devise algorithms for estimating the critic $J^{\theta }(t,x)$, we need useful characterizations of the value function. We have two, both of which follow from the observation that 
+The first stage in the *actor-critic algorithm* is *policy evaluation*. Namely, suppose we have an admissible policy $\pi^{\phi}$ whose value function $J(t,x)\coloneqq J(t,x;\phi )$ we would like to approximate $J^{\theta}(t,x)$. In order to devise algorithms for estimating the critic $J^{\theta }(t,x)$, we need useful characterizations of the value function. We have two, both of which follow from the observation that the process defined at times $[t,T]$ by 
 
-$$\begin{equation}\label{eqn:martingale}
-        \widetilde{M}_t \coloneqq e^{-\beta t}J(t,\widetilde{X}_t) + \int_{0}^{t} e^{-\beta s} \widetilde{F}(s,\widetilde{X}_s)\,ds
-\end{equation}$$ 
+$$\begin{align}
+        \widetilde{M}_s &\coloneqq e^{-\beta s}J(s,x) + \int_{t}^{s} e^{-\beta u} \widetilde{F}(u,\widetilde{X}_u)\,ds\label{eqn:martingale}\\
+        &= \widetilde{\mathbf{E}}_{s,x} \left[ \int_{t}^T e^{-\beta u} \widetilde{F}(u,\widetilde{X}_u)du + e^{-\beta T}g(\widetilde{X}_T) \right]
+\end{align}$$ 
 
-is a $(\mathcal{F}^{\overline{X}}_t, \mathbf{P}^{W})$-martingale in the case $\widetilde{X}=\overline{X}$ and $\widetilde{F}=\overline{F}$, and a $(\mathcal{F}^{X^{\pi}}_t, \mathbf{P})$-martingale in the case $\widetilde{X}=X^{\pi}$ and $\widetilde{F}=F$.
+is an $(\mathcal{F}^{\overline{X}}_s, \mathbf{P}^{W})$-martingale in the case $\widetilde{X}=\overline{X}$, $\widetilde{F}=\overline{F}$, and $\widetilde{\mathbf{E}}=\mathbf{E}^{\mathbf{P}^W}$, and a $(\mathcal{F}^{X^{\pi}}_s, \mathbf{P})$-martingale in the case $\widetilde{X}=X^{\pi}$, $\widetilde{F}=F$, and $\widetilde{\mathbf{E}}=\mathbf{E}^\mathbf{P}$.
 
 #### Theorem 1 (*Martingality characterization of the value function*).
-Let $J^{\theta }\colon [0,T] \times \mathbf{R}^{d} \to \mathbf{R}$ be a $C^{1,2}$ function such that $J^{\theta }(T,x)=h(x)$. Define $M^{\theta }_t$ as in Equation \ref{eqn:martingale} with $J$ replaced by $J^{\theta}$. The following are equivalent:
+Let $J^{\theta }\colon [0,T] \times \mathbf{R} \to \mathbf{R}$ be a $C^{1,2}$ function such that $J^{\theta }(T,x)=g(x)$. Define $M^{\theta }_t$ as in Equation \ref{eqn:martingale} with $J$ replaced by $J^{\theta}$. The following are equivalent:
 1. $J^{\theta }=J$ is the value function.
 2. For any initialization $(t,x)\in [0,T) \times \mathbf{R}^{d}$, the process
 
-    $$\overline{M}^{\theta }_s \coloneqq  e^{-\beta  s}J^{\theta }(s,\overline{X}^{\pi}_u) + \int_{t}^{s} e^{-\beta  s}\overline{F}(u,\overline{X}^{\pi}_u)\,du$$
+    $$\overline{M}^{\theta }_s \coloneqq  e^{-\beta  s}J^{\theta }(s,\overline{X}^{\pi}_s) + \int_{t}^{s} e^{-\beta s}\overline{F}(u,\overline{X}^{\pi}_u)\,du$$
 
     is a $(\mathcal{F}_{t}^{\overline{X}^{\pi}},\mathbf{P}^{W})$-martingale on $[t,T]$.
 3. (Martingale orthogonality). For every $(\mathcal{F}_t^{X^{\pi}}, \mathbf{P})$-progressively measurable bounded process $\xi_t$,
 
-    $$\E^{\mathbf{P}}\int_{0}^{T} \xi_t\,dM^{\theta }_t=0.$$
+    $$\begin{equation}\label{eqn:mo}\E^{\mathbf{P}}\int_{0}^{T} \xi_t\,dM^{\theta }_t=0.\end{equation}$$
 
 <details>
 <summary>Proof.</summary>
-That the true value function satisfies both (2) and (3) is immediate from Ito's formula. To sE (2) implies (1), we note that 
+That the true value function satisfies both (2) and (3) is immediate from Ito's formula. To see (2) implies (1), we note that 
 
 $$\begin{align*}
-        e^{-\beta  t}\widetilde{J}(t,x)&=   \overline{M}_t \\
-                          &= \E^{\mathbf{P}^{W}}[\overline{M}_T|\mathcal{F}^{\overline{X}^{\pi}}_t]\\
+        e^{-\beta  t}J^\theta(t,x)&=   \overline{M}_t^\theta \\
+                          &= \E^{\mathbf{P}^{W}}[\overline{M}_T^\theta|\mathcal{F}^{\overline{X}^{\pi}}_t]\\
                           &= \E^{\mathbf{P}^{W}}[\overline{M}_T|\overline{X}^{\pi}_t=x]  \\
                           &= e^{-\beta t}J(t,x)  
 \end{align*}$$
 
-where we used the Markov property for $\overline{X}^{\pi}_t$ in line 3. 
+where we used the Markov property for $\overline{X}^{\pi}_t$ in line 3 together with the Martingale property for $\bar{M}_s$. 
 
-We will now show (3) is equivalent to (2). Firstly note that
+We will now show (3) is equivalent to (2). We first show that (2) is equivalent to (3'), where we replace $M^\theta_t$ in the martingale orthogonality condition with $\overline{M}^\theta_t$. Firstly note that 
 
 $$
-dM^{\theta }_t =  dJ^{\theta }(t,\overline{X}^{\pi}_t)+F(t,\overline{X}^{\pi}_t,a,\pi)dt-\beta \widetilde{J}^{\pi}(t,\overline{X}^{\pi}_t)dt.
+dM^{\theta }_t =  dJ^{\theta }(t,\overline{X}^{\pi}_t)+\overline{F}(t,\overline{X}^{\pi}_t)dt-\beta J^{\theta}(t,\overline{X}^{\pi}_t)dt.
 $$ 
 
-If $\overline{M}^{\theta }_t$ is a martingale, then integrating any bounded test process $\xi_t^\prime=\xi_t e^{\beta t}$ against $\overline{M}_t$ yields a mean zero martingale proving (2) implies (3). For the converse, by Ito's lemma, $M^{\theta }_t$ is a diffusion $M^{\theta }_t=\int_{0}^{t} \widetilde{b}_s\,ds + \int_{0}^{t} \widetilde{\sigma}_s\,dW_s$ for some $\mathcal{F}^{X^{\pi}}$-adapted processes $\widetilde{b}_t, \widetilde{\sigma}_t$. Taking $\xi_t$ an arbitrary finite variation process, we conclude $b_t=0$, hence $M^{\theta }_t$ is a $(\mathcal{F}^{X^{\pi}}_t,\mathbf{P})$-martingale.
-
-Now to show that this completes the proof, note that any $(\mathcal{F}^{X^{\pi}}_t,\mathbf{P})$-progressively measurable process $\xi_t$ takes the form $\xi_t \coloneqq \xi(t,X_{t \wedge \bullet }^{\pi})$ for some measurable map $\xi\colon [0,T] \times C([0,T], \mathbf{R})\to \mathbf{R}$. Defining $\overline{\xi}_t\coloneqq \xi(t,\overline{X}^{\pi}_{t \wedge \bullet } )$, we observe 
+It is clear that if $\overline{M}^{\theta }_t$ is a martingale then integrating any bounded test process $\xi_t^\prime=\xi_t e^{\beta t}$ against $\overline{M}^{\theta }_t$ yields a mean zero martingale. For the converse, by It\^o's lemma, $\overline{M}^{\theta }_t$ is a diffusion, hence $\overline{M}^{\theta }_t=\int_{0}^{t} \widetilde{b}_s\,ds + \int_{0}^{t} \widetilde{\sigma}_s\,dW_s$ for some $\euscr{F}^{X^{\pi}}$-adapted processes $\widetilde{b}_t, \widetilde{\sigma}_t$. It follows that
 
 $$
-\begin{align*}
-       \E^{\mathbf{P}}\left[ \int_{0}^{T} \xi_t\,dM^{\theta }_t \right] =  \E^{\mathbf{P}^{W}}\left[ \int_{0}^{T} \overline{\xi}_te^{\beta  t}\,d\overline{M}^{\theta }_t \right]
-.\end{align*} 
+\E \int_{0}^{T} \xi_t \widetilde{b}_t\,dt=0
+$$ 
+
+for an arbitrary $\euscr{F}_t^{\overline{X}^{\pi}}$-adapted finite variation process $\xi_t$, thus by denseness we conclude $b_t=0$ and thus $M^{\theta }_t$ is a $(\euscr{F}^{X^{\pi}}_t,\mathbf{P})$-martingale.
+
+Now to show that this completes the proof, note that any $(\euscr{F}^{X^{\pi}}_t,\mathbf{P})$-progressively measurable process $\xi_t$ takes the form $\xi_t \coloneqq \xi(t,X_{t \wedge \bullet }^{\pi})$ for some measurable map $\xi\colon [0,T] \times C([0,T], \mathbf{R})\to \mathbf{R}$. Defining $\overline{\xi}_t\coloneqq \xi(t,\overline{X}^{\pi}_{t \wedge \bullet } )$, we observe 
+
 $$
+       \E^{\mathbf{P}}\left[ \int_{0}^{T} \xi_t\,dM^{\theta }_t \right] =  \E^{\mathbf{P}^{W}}\left[ \int_{0}^{T} \overline{\xi}_te^{\beta  t}\,d\overline{M}^{\theta }_t \right] 
+$$
+
+from which the equivalence of (3) and (3') is immediate.
 </details>
 
 This theorem allows us to generalize various PE algorithms from discrete to continuous time. 
@@ -246,17 +255,17 @@ This theorem allows us to generalize various PE algorithms from discrete to cont
 1. Using the 1st martingality characterization of the value function, we can choose $\theta \in \Theta $ via minimization of the mean-square error
 
     $$\begin{align*}
-    \mathrm{ML}(\theta )&\coloneqq \|M^{\theta }_{T}-M^{\theta }\|_{\mathbf{L}^2(\mathcal{F}^{X^{\pi}}_t)}^2\\
-    & = \E^{\mathbf{P}}\left[ \int_{0}^{T}\left( e^{-\beta  T}h(X_T^{\pi})-e^{-\beta t}J^{\theta }(t,X^{\pi}_{t}) + \int_{t}^{T} e^{-\beta s}F(s,X^{\pi}_s,a^{\pi}_s,\pi)\,ds\right)^2\,dt \right]
+    \mathrm{ML}(\theta )&\coloneqq \|\overline{M}^{\theta }_{T}-\overline{M}^{\theta}_\bullet\|_{\mathbf{L}^2(\mathcal{F}^{\mathbf{X}^{\pi}}_t)}^2\\
+    & = \E^{\mathbf{P}}\left[ \int_{0}^{T}\left( e^{-\beta  T}g(X_T^{\pi})-e^{-\beta t}J^{\theta }(t,X^{\pi}_{t}) + \int_{t}^{T} e^{-\beta s}F(s,X^{\pi}_s,a^{\pi}_s)\,ds\right)^2\,dt \right]
     \end{align*}$$
 
-    via SGD. The function $\mathrm{ML}(\theta )$ is known as the *martingale loss function* and can be sEn as a continuous-time analogue of gradient Monte Carlo.
+    via SGD. The function $\mathrm{ML}(\theta )$ is known as the *martingale loss function* and can be seen as a continuous-time analogue of gradient Monte Carlo.
 
 2. Using the martingale orthogonality condition with test process $\xi_t = \frac{\partial J^{\theta }}{\partial \theta }(t,X^{\pi}_t)$, via stochastic approximation the corresponding update step is
 
     $$\begin{align*}
-    \frac{\partial J^{\theta }}{\partial \theta}(t,X^{\pi}_t) dM^{\theta }_t &\approx ( J^{\theta }(t+\Delta t,X^{\pi}_{t+\Delta t})\\
-    & + r(t,X^{\pi}_{t},A^{\pi}_{t})\Delta t - J^{\theta }(t,X^{\pi}_{t}) + \gamma H(\pi(A^{\pi}_t|t,X^{\pi}_t))\Delta t) \frac{\partial J^{\theta }}{\partial \theta} (t,X^{\pi}_t)
+    \frac{\partial J^{\theta }}{\partial \theta}(t,X^{\pi}_t) dM^{\theta }_t &\approx ( J^{\theta }(t+\Delta t,X^{\pi}_{t+\Delta t})- J^{\theta }(t,X^{\pi}_{t})\\
+    & + (r(t,X^{\pi}_{t},A^{\pi}_{t}) + \gamma H(\pi(A^{\pi}_t|t,X^{\pi}_t)) - \beta J^\theta(t, X^\pi_t)) \Delta t) \frac{\partial J^{\theta }}{\partial \theta} (t,X^{\pi}_t)
     \end{align*}$$
 
     hence we obtain an analogue of the semi-gradient TD(0) algorithm.
@@ -290,10 +299,10 @@ $$
 where 
 
 $$
-\widetilde{r}(t,x,a;\phi )\coloneqq \gamma  q(t,x,a) + (\mathcal{L}^{a}J(t,x;\phi ) + r(t,x,a)+ \gamma H(t,x,a) - \beta J(t,x;\phi))\frac{\partial }{\partial \phi }\log \pi(a|t,x).
+\widetilde{r}(t,x,a;\phi )\coloneqq \gamma  q(t,x,a) + (\mathcal{L}^{a}J(t,x;\phi ) + r(t,x,a)+ \gamma H(\pi^\phi(a|t,x)) - \beta J(t,x;\phi))\frac{\partial }{\partial \phi }\log \pi(a|t,x).
 $$ 
 
-and $q(t,x,a)=\frac{\partial H}{\partial \phi}(t,x,a) $ Thus, Feynman-Kac implies that $g^{\phi}$ is uniquely characterized as the conditional expectation 
+and $q(t,x,a)=\frac{\partial H \circ \pi}{\partial \phi}(t,x,a) $. Thus, Feynman-Kac implies that $g^{\phi}$ is uniquely characterized as the conditional expectation 
 
 $$
 g(t,x;\phi )=\E_{t,x}^{\mathbf{P}}\left[ \int_{t}^{T}e^{-\beta (s-t)} \widetilde{r}(s,X^{\pi}_s,A^{\pi}_s;\phi )\,ds \right] 
@@ -318,9 +327,9 @@ The above was intuition for the argument we will use, replacing $X^{a}_t$ with t
 #### Theorem 2 (*Representation of policy gradient*).
 The policy gradient is given by 
 
-$$
+$$\begin{equation}\label{eqn:pg}
 g(t,x;\phi ) = \E^{\mathbf{P}}_{t,x}\left[ \int_{t}^{T} e^{-\beta (s-t)} \left(\frac{\partial }{\partial \phi } \log \pi^{\phi }(A^{\pi}_s|s,X^{\phi }_s)e^{\beta s}dM_s^{\phi} + \gamma q(s,X^{\phi }_s,A^{\phi}_s)ds\right)  \right] 
-$$ 
+\end{equation}$$ 
 
 where $M_{t}^{\phi}$ is defined as in Equation \ref{eqn:martingale} with $\pi=\pi^{\phi}$.
 
@@ -359,7 +368,7 @@ $$
 .\end{align*} 
 $$
 
-Finally, it remains justify applying dominated convergence to take the limit $n \to \infty$ on both sides. For the right hand-side, we note 
+Finally, it remains justifying applying dominated convergence to take the limit $n \to \infty$ on both sides. For the right hand-side, we note 
 
 $$
 \begin{align*}
@@ -383,18 +392,35 @@ From this, together with the fact that we showed the local-martingale $N^{a}_t$ 
 #### Theorem 3 (Martingale orthogonality for policy gradient).
 For every $(\mathcal{F}_t^{X^{\ast}}, \mathbf{P})$-progressively measurable bounded process $\eta$ and $x \in \mathbf{R}$, we have 
 
-$$
+$$\begin{equation}\label{eqn:mo2}
 0 = \E^{\mathbf{P}}_{x}\left[ \int_{0}^{T} \eta _s \left( \frac{\partial }{\partial \phi } \log \pi^{\ast}(A^{\ast}_s|s,X^{\ast}_s)d M^{\ast}_s + \gamma q(s,X^{\ast}_s,A^{\ast}_s)ds \right)   \right] 
-.$$ 
+.\end{equation}$$ 
 
 We use Theorems 2 and 3 in conjunction with Theorem 1 to design offline and online AC algorithms respectively.
 
 # 3. AC algorithms
 As in the discrete-time MDP setting, our AC algorithms consist of successive applications of policy evaluation and policy gradient. Having carried out the theoretical analysis of PE and PG in continuous time, we now discretize over a finite-sample grid $t_k=k\Delta t$ for $0 \leq k \leq \left\lfloor{T / \Delta t }\right\rfloor \eqqcolon K$.
 
-We begin with an example of an offline algorithm. This is inherently episodic, with critic-actor parameters $(\theta , \phi )$ updated after a full trajectory (i.e. episode) $$(X^{\pi}_{t_k}, A^{\pi}_{t_k})$$ is sampled. We use the martingale orthogonality condition from Theorem 1 to carry out policy evaluation using a general test process $\xi_t$ which corresponds to different choices of algorithms. The policy improvement step is carried out using a discrete-time estimate of the policy gradient given by Theorem 2. For the online learning algorithm, we now update the critic using the martingale orthogonality condition after each time step $t_k$, rather than after sampling an entire state-action trajectory. We estimate the policy gradient using Theorem 3, taking a test function $\eta_{t_k}$ which satisfies $\eta_{t_k}=0$ for $t_k > t$ at time $t=t_{l}$, and again updating incrementally after each time step.
+We begin with an example of an offline algorithm. This is inherently episodic, with critic-actor parameters $(\theta , \phi )$ updated after a full trajectory (i.e. episode) $$(X^{\pi}_{t_k}, A^{\pi}_{t_k})$$ is sampled. We use the martingale orthogonality condition from Theorem 1 to carry out policy evaluation using a general test process $\xi_t$ which corresponds to different choices of algorithms. The policy improvement step is carried out using a discrete-time estimate of the policy gradient given by Theorem 2.
+
+<div class="text-center">
+{% include figure.liquid 
+   path="/assets/img/blogs/2026/continuous_reinforcement_learning/ac_algo_offline.png"
+   caption="Figure 1: Offline AC algorithm using the martingale orthogonality condition (Equation \ref{eqn:mo}) for PE and Equation \ref{eqn:pg} for PG."
+   class="img-fluid rounded z-depth-1"
+%}
+</div>
+
+For the online learning algorithm, we now update the critic using the martingale orthogonality condition after each time step $t_k$, rather than after sampling an entire state-action trajectory. We estimate the policy gradient using Theorem 3, taking a test function $\eta_{t_k}$ which satisfies $\eta_{t_k}=0$ for $t_k > t$ at time $t=t_{l}$, and again updating incrementally after each time step.
 
 
+<div class="text-center">
+{% include figure.liquid 
+   path="/assets/img/blogs/2026/continuous_reinforcement_learning/ac_algo_online.png"
+   caption="Figure 1: Online AC algorithm using the martingale orthogonality conditions (Equations \ref{eqn:mo} and \ref{eqn:mo2}) for PE and PG."
+   class="img-fluid rounded z-depth-1"
+%}
+</div>
 
 ## 3.1 Application to MVO
 
