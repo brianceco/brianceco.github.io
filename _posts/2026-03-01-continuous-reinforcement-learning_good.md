@@ -54,9 +54,11 @@ J(x_0;\phi )= \sum\limits_{a_0 \in \mathcal{A}}^{} \pi^{\phi }(a_0|x_0)Q^{\phi }
 $$ 
 
 where $$Q(x,a;\phi )\coloneqq\E_{x,a}\left[ \sum\limits_{t=0}^{T} \beta ^{t}r(X^{\phi }_t,A^{\phi }_t) \right]$$ is the $Q$-function associated to $\pi^{\phi}$. Taking the gradient with respect to $\phi $ yields 
+
 $$
         \frac{\partial J}{\partial \phi } (x_0;\phi ) =   \sum\limits_{a_0 \in \mathcal{A}}^{} \frac{\partial \pi^{\phi }}{\partial \phi } (a_0|x_0) Q(x_0,a_0;\phi ) + \pi^{\phi }(a_0|x_0)\frac{\partial Q}{\partial \phi } (x_0,a_0;\phi )
 .$$
+
 We consequently unroll the $Q$-function one step forward in time by conditioning on $X^{\phi }_1$, using the Markovian structure of $(X^{\phi }_t,A_t^{\phi })$:
 
 $$
@@ -333,11 +335,11 @@ The above was intuition for the argument we will use, replacing $X^{a}_t$ with t
 #### Theorem 2 (*Representation of policy gradient*).
 The policy gradient is given by 
 
-$$\begin{equation}\label{eqn:pg}
+$$\begin{align}\label{eqn:pg}
 g(t,x;\phi ) = \E^{\mathbf{P}}_{t,x}\left[ \int_{t}^{T} e^{-\beta (s-t)} \left(\frac{\partial }{\partial \phi } \log \pi^{\phi }(A^{\pi}_s|s,X^{\phi }_s)e^{\beta s}dM_s^{\phi} + \gamma q(s,X^{\phi }_s,A^{\phi}_s)ds\right)  \right] 
-\end{equation}$$ 
+\end{align}$$ 
 
-where $M_{t}^{\phi}$ is defined as in Equation \ref{eqn:martingale} with $\pi=\pi^{\phi}$.
+where $M_{t}^{\phi}$ is defined as in Equation \ref{eqn:martingale} with $\pi=\pi^{\phi}.$
 
 
 <details>
