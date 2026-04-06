@@ -28,6 +28,17 @@ mjx-container {
   }
 }
 
+// Make block (display) equations horizontally scrollable on narrow viewports
+// so wide formulas don't blow out the page margins on mobile.
+mjx-container[jax="CHTML"][display="true"] {
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  // Give scrolled equations a little breathing room so descenders/scrollbars
+  // don't clip against following text.
+  padding-bottom: 0.25rem;
+}
+
 .equation {
   margin-bottom: 1rem;
   text-align: center;
