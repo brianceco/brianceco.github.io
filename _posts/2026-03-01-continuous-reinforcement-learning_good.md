@@ -56,8 +56,8 @@ $$
 where $$Q(x,a;\phi )\coloneqq\E_{x,a}\left[ \sum\limits_{t=0}^{T} \beta ^{t}r(X^{\phi }_t,A^{\phi }_t) \right]$$ is the $Q$-function associated to $\pi^{\phi}$. Taking the gradient with respect to $\phi $ yields 
 
 $$
-        \frac{\partial J}{\partial \phi } (x_0;\phi ) =   \sum\limits_{a_0 \in \mathcal{A}}^{} \frac{\partial \pi^{\phi }}{\partial \phi } (a_0|x_0) Q(x_0,a_0;\phi ) + \pi^{\phi }(a_0|x_0)\frac{\partial Q}{\partial \phi } (x_0,a_0;\phi )
-.$$
+        \frac{\partial J}{\partial \phi } (x_0;\phi ) =   \sum\limits_{a_0 \in \mathcal{A}}^{} \frac{\partial \pi^{\phi }}{\partial \phi } (a_0|x_0) Q(x_0,a_0;\phi ) + \pi^{\phi }(a_0|x_0)\frac{\partial Q}{\partial \phi } (x_0,a_0;\phi ).
+$$
 
 We consequently unroll the $Q$-function one step forward in time by conditioning on $X^{\phi }_1$, using the Markovian structure of $(X^{\phi }_t,A_t^{\phi })$:
 
@@ -203,10 +203,10 @@ $$
 ## **2.2. Evaluation: martingality conditions**
 The first stage in the *actor-critic algorithm* is *policy evaluation*. Namely, suppose we have an admissible policy $\pi^{\phi}$ whose value function $J(t,x)\coloneqq J(t,x;\phi )$ we would like to approximate $J^{\theta}(t,x)$. In order to devise algorithms for estimating the critic $J^{\theta }(t,x)$, we need useful characterizations of the value function. We have two, both of which follow from the observation that the process defined at times $[t,T]$ by 
 
-$$\begin{align}
+$$\begin{align*}
         \widetilde{M}_s &\coloneqq e^{-\beta s}J(s,x) + \int_{t}^{s} e^{-\beta u} \widetilde{F}(u,\widetilde{X}_u)\,ds\label{eqn:martingale}\\
         &= \widetilde{\mathbf{E}}_{s,x} \left[ \int_{t}^T e^{-\beta u} \widetilde{F}(u,\widetilde{X}_u)du + e^{-\beta T}g(\widetilde{X}_T) \right]
-\end{align}$$ 
+\end{align*}$$ 
 
 is an $(\mathcal{F}^{\overline{X}}_s, \mathbf{P}^{W})$-martingale in the case $\widetilde{X}=\overline{X}$, $\widetilde{F}=\overline{F}$, and $\widetilde{\mathbf{E}}=\mathbf{E}^{\mathbf{P}^W}$, and a $(\mathcal{F}^{X^{\pi}}_s, \mathbf{P})$-martingale in the case $\widetilde{X}=X^{\pi}$, $\widetilde{F}=F$, and $\widetilde{\mathbf{E}}=\mathbf{E}^\mathbf{P}$.
 
