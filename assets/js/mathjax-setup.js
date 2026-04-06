@@ -30,11 +30,13 @@ window.MathJax = {
           const style = document.createElement("style");
           style.innerHTML = `
           mjx-container[jax="CHTML"][display="true"] {
-            overflow: visible !important;
+            overflow-x: auto !important;
+            overflow-y: hidden !important;
+            max-width: 100% !important;
+            padding-bottom: 0.25rem;
           }
           .mjx-container {
             color: inherit;
-            overflow: visible !important;
             max-width: 100%;
           }
         `;
