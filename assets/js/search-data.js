@@ -27,17 +27,6 @@ ninja.data = [{
             window.location.href = "/blog/2026/continuous_reinforcement_learning/";
           
         },
-      },{id: "post-continuous-reinforcement-learning",
-        
-          title: "(continuous) Reinforcement Learning",
-        
-        description: "",
-        section: "Posts",
-        handler: () => {
-          
-            window.location.href = "/blog/2026/continuous-reinforcement-learning_good/";
-          
-        },
       },{id: "books-the-godfather",
           title: 'The Godfather',
           description: "",
