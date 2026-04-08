@@ -213,3 +213,26 @@
     }
   }
 }
+
+// Inline post bibliography (used with --template bib_post)
+.post-bibliography {
+  ol.bibliography {
+    list-style: none;
+    padding-left: 0;
+    counter-reset: bib-counter;
+
+    li {
+      counter-increment: bib-counter;
+      padding-left: 2.5em;
+      position: relative;
+      margin-bottom: 0.5rem;
+
+      &::before {
+        content: "[" counter(bib-counter) "]";
+        position: absolute;
+        left: 0;
+        width: 2.5em;
+      }
+    }
+  }
+}

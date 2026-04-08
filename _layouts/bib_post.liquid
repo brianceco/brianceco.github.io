@@ -1,0 +1,20 @@
+---
+---
+{%- assign author_count = entry.author_array | size -%}
+{%- for author in entry.author_array -%}
+  {{- author.first }} {{ author.last -}}
+  {%- unless forloop.last -%}
+    {%- if author_count > 2 %}, {% else %} and {% endif -%}
+  {%- endunless -%}
+{%- endfor %}.
+{%- if entry.html %}
+  {%- if entry.html contains '://' %}
+    "<a href="{{ entry.html }}">{{ entry.title }}</a>."
+  {%- else %}
+    "<a href="{{ entry.html | prepend: '/assets/html/' | relative_url }}">{{ entry.title }}</a>."
+  {%- endif %}
+{%- else %}
+  "{{ entry.title }}."
+{%- endif %}
+{%- if entry.journal %} <em>{{ entry.journal }}</em>,{% elsif entry.booktitle %} <em>{{ entry.booktitle }}</em>,{% endif %}
+{{ entry.year }}.
