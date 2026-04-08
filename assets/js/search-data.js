@@ -24,6 +24,17 @@ ninja.data = [{
         section: "Posts",
         handler: () => {
           
+            window.location.href = "/blog/2026/continuous_reinforcement_learning/";
+          
+        },
+      },{id: "post-continuous-reinforcement-learning",
+        
+          title: "(continuous) Reinforcement Learning",
+        
+        description: "",
+        section: "Posts",
+        handler: () => {
+          
             window.location.href = "/blog/2026/continuous-reinforcement-learning_good/";
           
         },
