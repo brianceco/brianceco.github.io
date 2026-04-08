@@ -3,12 +3,12 @@ layout: post
 title: (continuous) Reinforcement Learning
 date: 2026-04-08
 description: 
-tags: reinforcement_learning 
+tags: reinforcement_learning, stochastic_control 
 toc:
   beginning: true
 ---
 
-Reinforcement learning (RL) is a machine learning paradigm which formalizes the *trial-and-error* approach to learning: an *agent* interacts with an *environment* via some *policy* they can control, so as to maximize some *reward*. It has been widely successful in achieving high level performance in a wide range of activities, including games like [GO](https://en.wikipedia.org/wiki/AlphaGo), [chess](https://en.wikipedia.org/wiki/AlphaZero), and [Dota]()). It has also been leveraged towards more important tasks, among them, [teaching LLMs how to add](https://arxiv.org/abs/2501.12948).
+Reinforcement learning (RL) is a machine learning paradigm which formalizes the *trial-and-error* approach to learning: an *agent* interacts with an *environment* via some *policy* they can control, so as to maximize some *reward*. It has been widely successful in achieving high level performance in a wide range of activities, including games like [GO](https://en.wikipedia.org/wiki/AlphaGo), [chess](https://en.wikipedia.org/wiki/AlphaZero), and [Dota](https://arxiv.org/abs/1912.06680). It has also been leveraged towards more important tasks, among them, [teaching LLMs how to add](https://arxiv.org/abs/2501.12948).
 
 Even with all of the attention RL has received within the ML community, it is a surprising fact that the theory of RL in continuous time and continuous (state and action) space has remained largely underdeveloped. The following blog post aims to give a *very* brief introduction to a research program carried out by [Professor Xunyu Zhou](https://www.columbia.edu/~xz2574/index.htm) and his collaborators over the last ~5 years to develop a theory of *continuous RL*. I will focus in particular on two companion papers, {% cite jia2022pe %} and {% cite jia2022pg %} by Zhou and [Professor Yanwei Jia](https://sites.google.com/view/yanwei-jia), developing continuous-time-and-space analogues of policy evaluation and policy improvement methods within the theory of *relaxed stochastic control*.
 
@@ -45,7 +45,7 @@ $$\begin{align}\label{SGDPE}
 & =\theta  + \alpha \left( \widetilde{J}(X^{\phi }_t)-J^{\theta}(X^{\phi }_t) \right) \frac{\partial J}{\partial \theta } (X^{\phi }_t) 
 .\end{align}$$
 
-This defines **gradient-based methods**. If $\widetilde{J}(x)$ is an unbiased estimate of $J(x;\phi )$, then . A popular choice of offline algorithm is taking $$\widetilde{J}(X_t^{\phi })=G_t \coloneqq \sum\limits_{k=t}^{T} r(X_t^{\phi }, A^{\phi }_t)$$ the *return* from time $t$ onwards, which defines the (**gradient**) **Monte Carlo** algorithm. There are also popular choices for the target estimate which themselves depend on the current critic parameter $\widetilde{J}^{\theta}(x)$. For example, we can take the **temporal difference** (**TD(0)**) target $$\widetilde{J}(X_t^{\phi })=r(X_{t}^{\phi },A^{\phi }_t)+J^{\theta}(X_{t+1}^{\phi})$$. If we use as our update step the true gradient of the of the squared error, we get the **gradient TD(0)** (**GTD(0)**) algorithm. Often times however it is useful to still use the second line in Equation \ref{SGDPE} to update $\theta $, ignoring the effect of changing $\theta $ on the target $\widetilde{J}^{\theta }(x)$, as this leads to faster learning. Since this corresponds to a stochastic approximation learning algorithm which is not minimization of the gradient of a loss function, they are consequently called **semi-gradient methods** of PE.
+This defines **gradient-based methods**. If $\widetilde{J}(x)$ is an unbiased estimate of $J(x;\phi )$, then the above stochastic approximation algorithm has guaranteed convergence to a local optimum, provided the weights $\alpha$ satisfy [some standard growth conditions](https://en.wikipedia.org/wiki/Stochastic_approximation#Convergence_of_the_algorithm). A popular choice of offline algorithm is taking $$\widetilde{J}(X_t^{\phi })=G_t \coloneqq \sum\limits_{k=t}^{T} r(X_t^{\phi }, A^{\phi }_t)$$ the *return* from time $t$ onwards, which defines the (**gradient**) **Monte Carlo** algorithm. There are also popular choices for the target estimate which themselves depend on the current critic parameter $\widetilde{J}^{\theta}(x)$. For example, we can take the **temporal difference** (**TD(0)**) target $$\widetilde{J}(X_t^{\phi })=r(X_{t}^{\phi },A^{\phi }_t)+J^{\theta}(X_{t+1}^{\phi})$$. If we use as our update step the true gradient of the of the squared error, we get the **gradient TD(0)** (**GTD(0)**) algorithm. Often times however it is useful to still use the second line in Equation \ref{SGDPE} to update $\theta $, ignoring the effect of changing $\theta $ on the target $\widetilde{J}^{\theta }(x)$, as this leads to faster learning. Since this corresponds to a stochastic approximation learning algorithm which is not minimization of the gradient of a loss function, they are consequently called **semi-gradient methods** of PE.
 
 The PG step boils down to estimating the gradient $\frac{\partial J}{\partial \phi } (x;\phi )$ of the critic. In order to develop approximation algorithms, we must first characterize this gradient in a way that is amenable to estimation via observed data. Recalling the definition of the value function, taking the (iterated) conditional expectation with respect to the first action $A_0^{\phi}$, we have
 
@@ -112,10 +112,10 @@ $$
 For ease of notation, let's assume every process in sight is one-dimensional for simplicity. Here $A_t$ is our control process. As in the discrete RL setting, we seek to maximize the value function 
 
 $$
-J^{A}(t,x)\coloneqq  \E_{t,x}^{\mathbf{P}^{W}}\left[ \int_{t}^{T} e^{-\beta (s-t)}h(s,X^{a}_s,a_s)\,dt +e^{-\beta (T-t)} g(X^{a}_T) \right]
+J^{A}(t,x)\coloneqq  \E_{t,x}^{\mathbf{P}^{W}}\left[ \int_{t}^{T} e^{-\beta (s-t)}r(s,X^{a}_s,a_s)\,ds +e^{-\beta (T-t)} h(X^{a}_T) \right]
 $$ 
 
-That is, $J^A$ is given by the expected discounted running and terminal rewards $h(t,x,a)$ and $g(x)$ over a finite time horizon $T>0$. We seek a function $a(t,x)$ so that the value function $J^{\ast}(t,x)$ of the feedback policy $A^{\ast}_t = a(t,X^{a^{\ast}}_t)$ satisfies
+That is, $J^A$ is given by the expected discounted running and terminal rewards $r(t,x,a)$ and $h(x)$ over a finite time horizon $T>0$. We seek a function $a(t,x)$ so that the value function $J^{\ast}(t,x)$ of the feedback policy $A^{\ast}_t = a(t,X^{a^{\ast}}_t)$ satisfies
 
 $$
 J^{\ast}(t,x)\coloneqq J^{A^{\ast}}(t,x) = \sup _{A_t \in \mathcal{A}}J^{A}(t,x)
@@ -145,19 +145,19 @@ dX^{\pi}_t = b(t,X^{\pi}_t,A^{\pi}_t)dt + \sigma(t,X^{\pi}_t,A^{\pi}_t)dW_t
 Of course, $a^{\pi}$ is defined recursively in terms of the state $X^{\pi}$, so we must guarantee that this SDE (with randomized coefficients given the dependence on $Z$) exists, which requires some reasonable assumptions on the policy $\pi$. Now that we have randomized actions and state dynamics, we can formulate the objective of our continuous RL problem, which is simply to optimize the *exploration-regularized* value function 
 
 $$
-J^{\pi}(t,x) \coloneqq \E_{t,x}^{\mathbf{P}}\left[ \int_{t}^{T} e^{-\beta (s-t)}(r(s,X^{\pi}_s,A^{\pi}_s) +\gamma H(\pi(da|t,X^{\pi}_s))) \,ds +e^{-\beta (T-t)} g(X^{a}_T) \right] 
+J^{\pi}(t,x) \coloneqq \E_{t,x}^{\mathbf{P}}\left[ \int_{t}^{T} e^{-\beta (s-t)}(r(s,X^{\pi}_s,A^{\pi}_s) +\gamma H(\pi(da|t,X^{\pi}_s))) \,ds +e^{-\beta (T-t)} h(X^{\pi}_T) \right] 
 $$  
 
 where we have introduced the differential entropy regularization 
 
 $$
-H(\pi)\coloneqq -\int_{a \in \mathcal{A}} \pi(a)\log(\pi(a) \,da
+H(\pi)\coloneqq -\int_{a \in \mathcal{A}} \pi(a)\log(\pi(a)) \,da
 $$ 
 
 with temperature parameter $\gamma \geq 0$ to encourage exploration. Because we will use it repeatedly, for convenience we abbreviate the non-discounted integrand 
 
 $$
-F(t,x,a)\coloneqq  r(s,x,a) + \gamma H(\pi(a|t,x)).
+F(t,x,a)\coloneqq  r(t,x,a) + \gamma H(\pi(a|t,x)).
 $$ 
 
 While we have setup a reasonable model for continuous RL, from a theoretical standpoint, it is kind of annoying that we are working with controls $A_t^{\pi}$ randomized exogenously to our state noise $W_t$. This introduces questions about exactly which tools from classical stochastic control we can apply to our setting. In order to resolve such technical points, we would like to *integrate out* the policy randomization from our state process. The key observation is that, conditioned on the state $X_t^{\pi}$, the drift and variance processes satisfy 
@@ -187,7 +187,7 @@ $$
 Thus, $$\overline{X}_t^{\pi}$$ represents the environment dynamics where we have averaged out the policy exploration $$\pi_{t}$$. While $$X^{\pi}_t$$ can be observed by sampling the policy $$A^{\pi}_t \sim \pi(da\mid t,X^{\pi}_t)$$, $$\overline{X}^{\pi}_t$$ is unobservable. The authors motivate the definition of $$\overline{X}_t^{\pi}$$ via a law of large numbers argument which was formalized in {% cite jia2025accuracy %}. In fact it is somewhat nontrivial to show that the two processes agree in law. That the distribution of the 1-dimensional marginals of $$X_s^{\pi}$$ and $$\overline{X}_s^{\pi}$$ coincide is an immediate consequence of Corollary 4.7 of the ``Markovian projection formula" of {% cite brunick2013mimicking %}. In particular, this implies by Fubini's formula that the value function of the exploratory control coincides with the value function of the relaxed control 
 
 $$
-J^{\pi}(t,x) = \E^{\mathbf{P}^{W}}_{t,x}\left[ \int_{t}^{T} e^{-\beta (s-t)}\int_{A}^{} F(t,\overline{X}^{\pi}_{t},a,\pi)\pi(a|t,\overline{X}^{\pi}_t)\,dadt + e^{-\beta (T-t)}g(\overline{X}^{\pi}_T) \right]
+J^{\pi}(t,x) = \E^{\mathbf{P}^{W}}_{t,x}\left[ \int_{t}^{T} e^{-\beta (s-t)}\int_{A}^{} F(t,\overline{X}^{\pi}_{t},a,\pi)\pi(a|t,\overline{X}^{\pi}_t)\,dadt + e^{-\beta (T-t)}h(\overline{X}^{\pi}_T) \right]
 .$$
 
 Again, let's denote by $\overline{F}(t,x) \coloneqq \int_{A}^{} F(t,x,a,\pi)\pi(a \mid t,x)\,da$ the associated non-discounted integrand.
@@ -204,14 +204,14 @@ $$
 The first stage in the *actor-critic algorithm* is *policy evaluation*. Namely, suppose we have an admissible policy $\pi^{\phi}$ whose value function $J(t,x)\coloneqq J(t,x;\phi )$ we would like to approximate $J^{\theta}(t,x)$. In order to devise algorithms for estimating the critic $J^{\theta }(t,x)$, we need useful characterizations of the value function. We have two, both of which follow from the observation that the process defined at times $[t,T]$ by 
 
 $$\begin{align}
-        \widetilde{M}_s &\coloneqq e^{-\beta s}J(s,x) + \int_{t}^{s} e^{-\beta u} \widetilde{F}(u,\widetilde{X}_u)\,ds\label{eqn:martingale}\\
-        &= \widetilde{\mathbf{E}}_{s,x} \left[ \int_{t}^T e^{-\beta u} \widetilde{F}(u,\widetilde{X}_u)du + e^{-\beta T}g(\widetilde{X}_T) \right] 
+        \widetilde{M}_s &\coloneqq e^{-\beta s}J(s,x) + \int_{t}^{s} e^{-\beta u} \widetilde{F}(u,\widetilde{X}_u)\,du\label{eqn:martingale}\\
+        &= \widetilde{\mathbf{E}}_{s,x} \left[ \int_{t}^T e^{-\beta u} \widetilde{F}(u,\widetilde{X}_u)du + e^{-\beta T}h(\widetilde{X}_T) \right] 
 \end{align}$$ 
 
 is an $(\mathcal{F}^{\overline{X}}_s, \mathbf{P}^{W})$-martingale in the case $\widetilde{X}=\overline{X}$, $\widetilde{F}=\overline{F}$, and $\widetilde{\mathbf{E}}=\mathbf{E}^{\mathbf{P}^W}$, and a $(\mathcal{F}^{X^{\pi}}_s, \mathbf{P})$-martingale in the case $\widetilde{X}=X^{\pi}$, $\widetilde{F}=F$, and $\widetilde{\mathbf{E}}=\mathbf{E}^\mathbf{P}$.
 
 #### Theorem 1 (*Martingality characterization of the value function*).
-Let $J^{\theta }\colon [0,T] \times \mathbf{R} \to \mathbf{R}$ be a $C^{1,2}$ function such that $J^{\theta }(T,x)=g(x)$. Define $M^{\theta }_t$ as in Equation \ref{eqn:martingale} with $J$ replaced by $J^{\theta}$. The following are equivalent:
+Let $J^{\theta }\colon [0,T] \times \mathbf{R} \to \mathbf{R}$ be a $C^{1,2}$ function such that $J^{\theta }(T,x)=h(x)$. Define $M^{\theta }_t$ as in Equation \ref{eqn:martingale} with $J$ replaced by $J^{\theta}$. The following are equivalent:
 1. $J^{\theta }=J$ is the value function.
 2. For any initialization $(t,x)\in [0,T) \times \mathbf{R}^{d}$, the process
 
@@ -233,7 +233,7 @@ $$\begin{align*}
                           &= e^{-\beta t}J(t,x)  
 \end{align*}$$
 
-where we used the Markov property for $\overline{X}^{\pi}_t$ in line 3 together with the Martingale property for $\bar{M}_s$. 
+where we used the Markov property for $\overline{X}^{\pi}_t$ in line 3 together with the Martingale property for $\overline{M}_s$. 
 
 We will now show (3) is equivalent to (2). We first show that (2) is equivalent to (3'), where we replace $M^\theta_t$ in the martingale orthogonality condition with $\overline{M}^\theta_t$. Firstly note that 
 
@@ -247,7 +247,7 @@ $$
 \E \int_{0}^{T} \xi_t \widetilde{b}_t\,dt=0
 $$ 
 
-for an arbitrary $\euscr{F}_t^{\overline{X}^{\pi}}$-adapted finite variation process $\xi_t$, thus by denseness we conclude $b_t=0$ and thus $M^{\theta }_t$ is a $(\euscr{F}^{X^{\pi}}_t,\mathbf{P})$-martingale.
+for an arbitrary $\euscr{F}_t^{\overline{X}^{\pi}}$-adapted finite variation process $\xi_t$, thus by denseness we conclude $\widetilde{b}_t=0$ and thus $M^{\theta }_t$ is a $(\euscr{F}^{X^{\pi}}_t,\mathbf{P})$-martingale.
 
 Now to show that this completes the proof, note that any $(\euscr{F}^{X^{\pi}}_t,\mathbf{P})$-progressively measurable process $\xi_t$ takes the form $\xi_t \coloneqq \xi(t,X_{t \wedge \bullet }^{\pi})$ for some measurable map $\xi\colon [0,T] \times C([0,T], \mathbf{R})\to \mathbf{R}$. Defining $\overline{\xi}_t\coloneqq \xi(t,\overline{X}^{\pi}_{t \wedge \bullet } )$, we observe 
 
@@ -264,7 +264,7 @@ This theorem allows us to generalize various PE algorithms from discrete to cont
 
     $$\begin{align*}
     \mathrm{ML}(\theta )&\coloneqq \|\overline{M}^{\theta }_{T}-\overline{M}^{\theta}_\bullet\|_{\mathbf{L}^2(\mathcal{F}^{\mathbf{X}^{\pi}}_t)}^2\\
-    & = \E^{\mathbf{P}}\left[ \int_{0}^{T}\left( e^{-\beta  T}g(X_T^{\pi})-e^{-\beta t}J^{\theta }(t,X^{\pi}_{t}) + \int_{t}^{T} e^{-\beta s}F(s,X^{\pi}_s,a^{\pi}_s)\,ds\right)^2\,dt \right]
+    & = \E^{\mathbf{P}}\left[ \int_{0}^{T}\left( e^{-\beta  T}h(X_T^{\pi})-e^{-\beta t}J^{\theta }(t,X^{\pi}_{t}) + \int_{t}^{T} e^{-\beta s}F(s,X^{\pi}_s,a^{\pi}_s)\,ds\right)^2\,dt \right]
     \end{align*}$$
 
     via SGD. The function $\mathrm{ML}(\theta )$ is known as the *martingale loss function* and can be seen as a continuous-time analogue of gradient Monte Carlo.
@@ -291,7 +291,7 @@ Having carried out the policy evaluation step to obtain the critic $J^{\theta }(
 $$
 \begin{cases}
         \int_{A}^{} (\mathcal{L}^{a}J(t,x;\phi ) + r(t,x,a)+ \gamma H(\pi^{\phi }(a|t,x)) - \beta  J)  \pi(a|t,x)\,da =0\\
-       J(T,x;\pi^{\phi })=g(x)
+       J(T,x;\pi^{\phi })=h(x)
 \end{cases}
 $$ 
 
@@ -387,7 +387,7 @@ $$
 $$
 </details>
 
-There are two takeaways from Theorem 2. Firstly, the first integrand in the policy gradient is precisely the log-likelihood of the current estimated policy scaled by the (continuous) TD error $dM^{\phi }_s$ of the true value function $J(t,x;\phi)$. Secondly, in order to estimate the policy gradient at time $t$ via Theorem 2, we require the entire sample trajectory $$(X_s^{\phi }, A^{\phi }_s)_{s \in [0,T]}$$, hence we can only use this to produce offline algorithms. To derive online PG algorithms, we proceed analogously as in the case of PE. Namely, we would like to a martingale orthogonality condition to serve as a strong necessary condition for the policy gradient. We can achieve this for the policy gradient at an optimal portfolio $$\pi^{\ast}\coloneqq \pi^{\phi ^{\ast}}$$ occurring at an interior point $$\phi ^{\ast}\in \Phi \setminus \partial\Phi $$. That is, assume $J(t,x;\phi^{\ast})$ is maximized at $\phi ^{\ast}$ for any $(x,t)$. Then the first-order-condition $g(0,x;\phi ^{\ast})=0$ combined with Feynman-Kac implies 
+There are two takeaways from Theorem 2. Firstly, the first integrand in the policy gradient is precisely the log-likelihood of the current estimated policy scaled by the (continuous) TD error $dM^{\phi }_s$ of the true value function $J(t,x;\phi)$. Secondly, in order to estimate the policy gradient at time $t$ via Theorem 2, we require the entire sample trajectory $$(X_s^{\phi }, A^{\phi }_s)_{s \in [0,T]}$$, hence we can only use this to produce offline algorithms. To derive online PG algorithms, we proceed analogously as in the case of PE. Namely, we would like to a martingale orthogonality condition to serve as a strong necessary condition for the policy gradient. We can achieve this for the policy gradient at an optimal policy $$\pi^{\ast}\coloneqq \pi^{\phi ^{\ast}}$$ occurring at an interior point $$\phi ^{\ast}\in \Phi \setminus \partial\Phi $$. That is, assume $J(t,x;\phi^{\ast})$ is maximized at $\phi ^{\ast}$ for any $(x,t)$. Then the first-order-condition $g(0,x;\phi ^{\ast})=0$ combined with Feynman-Kac implies 
 
 $$
 \begin{align*}
@@ -425,7 +425,7 @@ For the online learning algorithm, we now update the critic using the martingale
 <div class="text-center">
 {% include figure.liquid 
    path="/assets/img/blogs/2026/continuous_reinforcement_learning/ac_algo_online.png"
-   caption="Figure 1: Online AC algorithm using the martingale orthogonality conditions (Equations \ref{eqn:mo} and \ref{eqn:mo2}) for PE and PG."
+   caption="Figure 2: Online AC algorithm using the martingale orthogonality conditions (Equations \ref{eqn:mo} and \ref{eqn:mo2}) for PE and PG."
    class="img-fluid rounded z-depth-1"
 %}
 </div>
@@ -452,7 +452,7 @@ $$
 
 which minimizes the terminal variance of wealth subject to the constraint $\E[X^{A}_T]=z$, with the latter encoded by the Lagrange multiplier $w$.
 
-We turn this into a relaxed stochastic control problem following the procedure outlined in Section 1, obtaining a state $X^{\pi}$ driven by an exploratory control $A_t\sim \pi(da|t,x)$.
+We turn this into a relaxed stochastic control problem following the procedure outlined in Section 2.1, obtaining a state $X^{\pi}$ driven by an exploratory control $A_t\sim \pi(da|t,x)$.
 
 We consider the parametric family of value functions of the form 
 
@@ -469,14 +469,14 @@ $$
 As we are now considering a minimization problem, we encourage exploration by penalizing by the differential entropy
 
 $$
--H(\pi^{\phi }(da|t,x;w)) = -\frac{1}{2}(\log (2\pi e) -(\phi _2 + \phi _3(T-t))
+-H(\pi^{\phi }(da|t,x;w)) = -\frac{1}{2}\left(\log (2\pi e) + \phi _2 + \phi _3(T-t)\right)
 $$
 
 
 <div class="text-center">
 {% include figure.liquid 
    path="/assets/img/blogs/2026/continuous_reinforcement_learning/offline_learning.png"
-   caption="Figure 1: Rows 1 and 2: learning trajectories for the parameters $\theta, \phi \in \mathbf{R}^3$ during offline training. Row 3: the trajectory of the (batched) mean, standard deviation, sharpe ratio of terminal wealth $x_T$ during offline training with $T=20$ years of data and 2000 episodes."
+   caption="Figure 3: Rows 1 and 2: learning trajectories for the parameters $\theta, \phi \in \mathbf{R}^3$ during offline training. Row 3: the trajectory of the (batched) mean, standard deviation, sharpe ratio of terminal wealth $x_T$ during offline training with $T=20$ years of data and 2000 episodes."
    class="img-fluid rounded z-depth-1"
 %}
 </div>
@@ -492,8 +492,8 @@ For PG, the gradient of the log-likelihood is given by
 $$
 \begin{align*}
         \frac{\partial \log \pi^{\phi }}{\partial \phi _1}   &=   - (a+\phi _1(x-w))(x-w)e^{-\phi _2 -\phi _3 (T-t)}\\
-        \frac{\partial \log \pi^{\phi }}{\partial \phi _2}   &=   - \frac{1}{2} (a+\phi _1(x-w))^2 e^{-\phi _2 -\phi _3 (T-t)}\\
-        \frac{\partial \log \pi^{\phi }}{\partial \phi _3}   &=   - \frac{T-t}{2} + \frac{(a+\phi _1(x-w))(x-w))^2}{2}e^{-\phi _2 -\phi _3 (T-t)}
+        \frac{\partial \log \pi^{\phi }}{\partial \phi _2}   &=   - \frac{1}{2} (1 - (a+\phi _1(x-w))^2 e^{-\phi _2 -\phi _3 (T-t)})\\
+        \frac{\partial \log \pi^{\phi }}{\partial \phi _3}   &=   - \frac{T-t}{2}\left(1 - (a+\phi _1(x-w))^2 e^{-\phi _2 -\phi _3 (T-t)}\right)
 .\end{align*}
 $$
 
@@ -507,7 +507,7 @@ $$
 <div class="text-center">
 {% include figure.liquid 
    path="/assets/img/blogs/2026/continuous_reinforcement_learning/online_learning.png"
-   caption="Figure 2: Rows 1 and 2: learning trajectories for the parameters $\theta, \phi \in \mathbf{R}^3$ during online training with $T=100$ years of data."
+   caption="Figure 4: Rows 1 and 2: learning trajectories for the parameters $\theta, \phi \in \mathbf{R}^3$ during online training with $T=100$ years of data."
    class="img-fluid rounded z-depth-1"
 %}
 </div>
@@ -517,12 +517,12 @@ We consider $\Delta t = \frac{1}{252}$ daily return data. For the offline algori
 <div class="text-center">
 {% include figure.liquid 
    path="/assets/img/blogs/2026/continuous_reinforcement_learning/results.png"
-   caption="Figure 3: OOS Distribution of mean, standard deviation, and sharpe ratio of terminal wealth evaluated from 256 1-year sample paths $S_t$."
+   caption="Figure 5: OOS Distribution of mean, standard deviation, and sharpe ratio of terminal wealth evaluated from 256 1-year sample paths $S_t$."
    class="img-fluid rounded z-depth-1"
 %}
 </div>
 
-Unsurprisingly, looking at the out-of-sample results in Figure 3, we see the offline algorithm achieves better performance as it is able to learn continuously from the entirety of the training data. Of course, a policy trained via online learning is generally preferable as it is more robust to regime shifts, heteroskedasticity, and other forms of nonstationarity present in financial data. The standard approach to combine the best of both offline and online learning is *offline-to-online (O2O) learning* {% cite nair2020awac %}, in which part of the backtesting data is used for offline learning to burn in the model parameters, before transitioning to online learning.
+Unsurprisingly, looking at the out-of-sample results in Figure 5, we see the offline algorithm achieves better performance as it is able to learn continuously from the entirety of the training data. Of course, a policy trained via online learning is generally preferable as it is more robust to regime shifts, heteroskedasticity, and other forms of nonstationarity present in financial data. The standard approach to combine the best of both offline and online learning is *offline-to-online (O2O) learning* {% cite nair2020awac %}, in which part of the backtesting data is used for offline learning to burn in the model parameters, before transitioning to online learning.
 
 # References
 
