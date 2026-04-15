@@ -48,4 +48,5 @@ nav_order: 1
   {% endfor %}
 </div>
 
+<p style="margin-top: 2rem; font-size: 0.85rem; text-align: center;"><em style="color: #828282 !important;">Blog layout is heavily inspired by the wonderful <a href="https://lilianweng.github.io" target="_blank" rel="noopener noreferrer">Lil'Log</a>.</em></p>
 </div>
