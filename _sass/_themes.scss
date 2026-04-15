@@ -13,9 +13,9 @@
   --global-theme-color: #2e7de9;
   --global-hover-color: #2e7de9;
   --global-hover-text-color: #{v.$white-color};
-  --global-footer-bg-color: #{v.$grey-color-dark};
-  --global-footer-text-color: #{v.$grey-color-light};
-  --global-footer-link-color: #{v.$white-color};
+  --global-footer-bg-color: #{v.$white-color};
+  --global-footer-text-color: #{v.$black-color};
+  --global-footer-link-color: #{v.$black-color};
   --global-distill-app-color: #{v.$grey-color};
   --global-divider-color: rgba(0, 0, 0, 0.1);
   --global-card-bg-color: #{v.$white-color};
@@ -83,9 +83,9 @@ html[data-theme="dark"] {
   --global-theme-color: #7aa2f7;
   --global-hover-color: #7aa2f7;
   --global-hover-text-color: #{v.$white-color};
-  --global-footer-bg-color: #{v.$grey-color-light};
-  --global-footer-text-color: #{v.$grey-color-dark};
-  --global-footer-link-color: #{v.$black-color};
+  --global-footer-bg-color: #1a1b26;
+  --global-footer-text-color: #e8e8e8;
+  --global-footer-link-color: #e8e8e8;
   --global-distill-app-color: #{v.$grey-color-light};
   --global-divider-color: #424246;
   --global-card-bg-color: #{v.$grey-900};

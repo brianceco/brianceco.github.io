@@ -8,6 +8,8 @@ toc:
   beginning: true
 ---
 
+<a href="https://github.com/brianceco/continuous_reinforcement_learning" target="_blank" rel="noopener noreferrer"><i class="fab fa-github"></i> brianceco/continuous_reinforcement_learning</a>
+
 Reinforcement learning (RL) is a machine learning paradigm which formalizes the *trial-and-error* approach to learning: an *agent* interacts with an *environment* via some *policy* they can control, so as to maximize some *reward*. It has been widely successful in achieving high level performance in a wide range of activities, including games like [GO](https://en.wikipedia.org/wiki/AlphaGo), [chess](https://en.wikipedia.org/wiki/AlphaZero), and [Dota](https://arxiv.org/abs/1912.06680). It has also been leveraged towards more important tasks, among them, [teaching LLMs how to add](https://arxiv.org/abs/2501.12948).
 
 Even with all of the attention RL has received within the ML community, it is a surprising fact that the theory of RL in continuous time and continuous (state and action) space has remained largely underdeveloped. The following blog post aims to give a *very* brief introduction to a research program carried out by [Professor Xunyu Zhou](https://www.columbia.edu/~xz2574/index.htm) and his collaborators over the last ~5 years to develop a theory of *continuous RL*. I will focus in particular on two companion papers, {% cite jia2022pe %} and {% cite jia2022pg %} by Zhou and [Professor Yanwei Jia](https://sites.google.com/view/yanwei-jia), developing continuous-time-and-space analogues of policy evaluation and policy improvement methods within the theory of *relaxed stochastic control*.
