@@ -1,4 +1,4 @@
----
+![alt text](image.png)---
 layout: page
 title: project 1
 description: with background image
