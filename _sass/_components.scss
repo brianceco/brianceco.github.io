@@ -21,7 +21,7 @@ ul.task-list input[type="checkbox"] {
 // Math
 
 mjx-container {
-  color: #c8c8c8 !important;
+  color: var(--global-text-color) !important;
 
   * {
     color: inherit;
