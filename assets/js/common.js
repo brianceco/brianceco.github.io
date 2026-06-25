@@ -57,4 +57,20 @@ $(document).ready(function () {
   $('[data-toggle="popover"]').popover({
     trigger: "hover",
   });
+
+  // open external links (and PDFs/assets) in a new tab
+  $("a[href]").each(function () {
+    const href = this.getAttribute("href");
+    if (!href) return;
+    // skip in-page anchors and non-navigational links
+    if (/^(#|mailto:|tel:|javascript:)/i.test(href)) return;
+
+    const isExternal = this.hostname && this.hostname !== window.location.hostname;
+    const isAsset = /\.(pdf|zip|docx?|pptx?|xlsx?)$/i.test(this.pathname || "");
+
+    if (isExternal || isAsset) {
+      this.setAttribute("target", "_blank");
+      this.setAttribute("rel", "noopener noreferrer");
+    }
+  });
 });
