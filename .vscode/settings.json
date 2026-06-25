@@ -3,8 +3,13 @@
         "Aradi",
         "Jaimungal’s",
         "Lipschitz",
+        "metaorder",
         "orientable",
         "Yanwei",
         "Zhou"
-    ]
+    ],
+    "[markdown]": {
+        "editor.tabSize": 3,
+        "editor.insertSpaces": true
+    }
 }
