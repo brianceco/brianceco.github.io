@@ -12,7 +12,7 @@ window.MathJax = {
       ZZ: "\\mathbf{Z}",
       QQ: "\\mathbf{Q}",
       CC: "\\mathbf{C}",
-      E: "\\mathbf{E}",
+      E: "\\operatorname{\\mathbf{E}}",
       euscr: ["\\mathscr{#1}", 1],
       bm: ["\\boldsymbol{#1}", 1],
       lb: "\\lbrace",
@@ -20,6 +20,10 @@ window.MathJax = {
       coloneqq: "\\mathrel{:=}",
       eqqcolon: "\\mathrel{=:}",
       colon: "\\mathrel{:}",
+      var: "\\operatorname{Var}",
+      cov: "\\operatorname{Cov}",
+      sgn: "\\operatorname{sgn}",
+      argmax: "\\operatorname*{argmax}"
     },
   },
   options: {
