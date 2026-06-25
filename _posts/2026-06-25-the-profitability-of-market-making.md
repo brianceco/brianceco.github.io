@@ -8,7 +8,7 @@ toc:
   beginning: true
 ---
 
-<a href="https://github.com/brianceco/continuous_reinforcement_learning" target="_blank" rel="noopener noreferrer"><i class="fab fa-github"></i> brianceco/continuous_reinforcement_learning</a>
+<a href="https://github.com/brianceco/profitability-of-market-making" target="_blank" rel="noopener noreferrer"><i class="fab fa-github"></i> brianceco/profitability-of-market-making</a>
 
 <div class="text-center">
 {% include figure.liquid 
