@@ -17,13 +17,24 @@ ninja.data = [{
             window.location.href = "/blog/";
           },
         },{id: "nav-projects",
-          title: "projects",
+          title: "Projects",
           description: "",
           section: "Navigation",
           handler: () => {
             window.location.href = "/projects/";
           },
-        },{id: "post-continuous-reinforcement-learning",
+        },{id: "post-the-profitability-of-market-making",
+        
+          title: "The Profitability of Market Making",
+        
+        description: "",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/the-profitability-of-market-making/";
+          
+        },
+      },{id: "post-continuous-reinforcement-learning",
         
           title: "(continuous) Reinforcement Learning",
         
