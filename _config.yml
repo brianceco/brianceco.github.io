@@ -302,6 +302,8 @@ scholar:
   details_link: Details
 
   query: "@*"
+  sort_by: author
+  order: ascending
   group_by: year
   group_order: descending
 
