@@ -166,7 +166,7 @@ where $$\sigma_D$$ denotes the daily volatility of the mid price increments $$\D
 <div class="text-center">
 {% include figure.liquid 
    path="/assets/img/blogs/2026/profitability-of-market-making/price-impact.png"
-   caption="Figure 3: Impact function $\mathcal{I}(\mathcal{Q})$ for TSLA. Fitted curve is of the form $c\mathcal{Q}^\delta$ for $c=7$ and $\delta=0.7$."
+   caption="Figure 3: Impact function $\mathcal{I}(\mathcal{Q})$ for TSLA. Fitted curve is of the form $c\mathcal{Q}^\delta$ for $c=2$ and $\delta=0.7$."
    class="img-fluid rounded z-depth-1"
 %}
 </div>
