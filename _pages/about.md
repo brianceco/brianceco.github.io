@@ -21,6 +21,12 @@ social: true # includes social icons at the bottom of the page
 #  scrollable: true # adds a vertical scroll bar if there are more than 3 news items
 #  limit: 5 # leave blank to include all the news in the `_news` folder
 
+latest_paper:
+  enabled: true
+  title: Active Portfolio Management in Concentrated Equity Markets
+  url: https://arxiv.org/abs/2609.27113
+  date: 2026-09-22
+
 latest_posts:
   enabled: true
   scrollable: true # adds a vertical scroll bar if there are more than 3 new posts items

@@ -48,6 +48,25 @@ layout: default
       {% include news.liquid limit=true %}
     {% endif %}
 
+    <!-- Latest paper -->
+    {% if page.latest_paper and page.latest_paper.enabled %}
+      <h2>
+        <a href="{{ '/research/' | relative_url }}" style="color: inherit">latest paper</a>
+      </h2>
+      <div class="news">
+        <div class="table-responsive">
+          <table class="table table-sm table-borderless">
+            <tr>
+              <th scope="row" style="width: 20%">{{ page.latest_paper.date | date: '%b %d, %Y' }}</th>
+              <td>
+                <a class="news-title" href="{{ page.latest_paper.url }}">{{ page.latest_paper.title }}</a>
+              </td>
+            </tr>
+          </table>
+        </div>
+      </div>
+    {% endif %}
+
     <!-- Latest posts -->
     {% if page.latest_posts and page.latest_posts.enabled %}
       <h2>
